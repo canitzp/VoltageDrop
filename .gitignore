@@ -1,1 +1,8 @@
 # Created by .ignore support plugin (hsz.mobi)
+/build/
+/Voltage Drop.ipr
+/Voltage Drop.iml
+/run/
+/Voltage Drop.iws
+/out/
+/.gradle/

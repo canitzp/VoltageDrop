@@ -1,19 +1,22 @@
 package de.canitzp.voltagedrop.capabilities;
 
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.common.util.INBTSerializable;
+
 /**
  * @author canitzp
  */
-public interface IEnergyDevice{
+public interface IEnergyDevice extends INBTSerializable<NBTTagCompound>{
 
     /**
      * @return The maximum of output voltage in Volts
      */
-    int getOutputVoltage();
+    float getOutputVoltage();
 
     /**
      * @return The maximum input voltage in Volts
      */
-    int getInputVoltage();
+    float getInputVoltage();
 
     /**
      * The voltage is equal to the max output voltage.
@@ -28,14 +31,16 @@ public interface IEnergyDevice{
      */
     int getInternalResistance();
 
-    float receiveEnergy(int voltage, float current, boolean simulate);
+    float receiveEnergy(float voltage, float current, boolean simulate);
 
-    float extractEnergy(int voltage, float current, boolean simulate);
+    float extractEnergy(float voltage, float current, boolean simulate);
 
     float getMaxCurrent();
 
     boolean canExtract();
 
     boolean canReceive();
+
+    float getMaxFlowCurrent();
 
 }

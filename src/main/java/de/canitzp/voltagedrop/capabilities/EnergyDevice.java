@@ -1,29 +1,33 @@
 package de.canitzp.voltagedrop.capabilities;
 
+import net.minecraft.nbt.NBTTagCompound;
+
 /**
  * @author canitzp
  */
 public class EnergyDevice implements IEnergyDevice{
 
-    public int voltage;
+    public float voltage;
     public float currentCurrent;
     public float maxCurrentCurrent;
 
-    public int voltageTolerance = 5;
+    public float voltageTolerance = 5;
     public float maxFlowCurrent = 3;
 
-    public EnergyDevice(int voltage, float maxCurrentCurrent){
+    public EnergyDevice(){}
+
+    public EnergyDevice(float voltage, float maxCurrentCurrent){
         this.voltage = voltage;
         this.maxCurrentCurrent = maxCurrentCurrent;
     }
 
     @Override
-    public int getOutputVoltage(){
+    public float getOutputVoltage(){
         return this.voltage;
     }
 
     @Override
-    public int getInputVoltage(){
+    public float getInputVoltage(){
         return this.voltage;
     }
 
@@ -43,14 +47,14 @@ public class EnergyDevice implements IEnergyDevice{
     }
 
     @Override
-    public float receiveEnergy(int voltage, float current, boolean simulate){
+    public float receiveEnergy(float voltage, float current, boolean simulate){
         if(!canReceive()){
             return 0;
         }
-        if(this.voltage + this.voltageTolerance < voltage){
+        if(!this.isVoltageCorrect(voltage)){
             return -1;
         }
-        float energyReceived = Math.min(this.maxCurrentCurrent - current, Math.min(this.maxFlowCurrent, this.maxFlowCurrent));
+        float energyReceived = Math.min(this.maxCurrentCurrent - this.currentCurrent, Math.min(this.maxFlowCurrent, current));
         if(!simulate){
             this.currentCurrent += energyReceived;
         }
@@ -58,14 +62,14 @@ public class EnergyDevice implements IEnergyDevice{
     }
 
     @Override
-    public float extractEnergy(int voltage, float current, boolean simulate){
+    public float extractEnergy(float voltage, float current, boolean simulate){
         if(!canExtract()){
             return 0;
         }
-        if(this.voltage + this.voltageTolerance < voltage){
+        if(!this.isVoltageCorrect(voltage)){
             return -1;
         }
-        float energyReceived = Math.min(this.maxCurrentCurrent, Math.min(this.maxFlowCurrent, current));
+        float energyReceived = Math.min(this.currentCurrent, Math.min(this.maxFlowCurrent, current));
         if(!simulate){
             this.currentCurrent -= energyReceived;
         }
@@ -87,8 +91,41 @@ public class EnergyDevice implements IEnergyDevice{
         return true;
     }
 
+    public float getMaxFlowCurrent(){
+        return maxFlowCurrent;
+    }
+
+    public EnergyDevice setMaxCurrentFlow(float maxCurrentFlow){
+        this.maxFlowCurrent = maxCurrentFlow;
+        return this;
+    }
+
+    public boolean isVoltageCorrect(float voltage){
+        return this.voltage + this.voltageTolerance > voltage;
+    }
+
     @Override
     public String toString(){
-        return "EnergyDevice={voltage=" + this.voltage + "; current=" + this.currentCurrent + "}";
+        return "EnergyDevice={voltage=" + this.voltage + "; current=" + this.currentCurrent + "/" + this.maxCurrentCurrent + "}";
+    }
+
+    @Override
+    public NBTTagCompound serializeNBT(){
+        NBTTagCompound nbt = new NBTTagCompound();
+        nbt.setFloat("Voltage", this.voltage);
+        nbt.setFloat("Current", this.currentCurrent);
+        nbt.setFloat("MaxCurrent", this.maxCurrentCurrent);
+        nbt.setFloat("VoltageTolerance", this.voltageTolerance);
+        nbt.setFloat("MaxFlow", this.maxFlowCurrent);
+        return nbt;
+    }
+
+    @Override
+    public void deserializeNBT(NBTTagCompound nbt){
+        this.voltage = nbt.getFloat("Voltage");
+        this.currentCurrent = nbt.getFloat("Current");
+        this.maxCurrentCurrent = nbt.getFloat("MaxCurrent");
+        this.voltageTolerance = nbt.getFloat("VoltageTolerance");
+        this.maxFlowCurrent = nbt.getFloat("MaxFlow");
     }
 }
