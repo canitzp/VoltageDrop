@@ -3,7 +3,7 @@ package de.canitzp.voltagedrop.capabilities;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 
-import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 
 /**
  * @author canitzp
@@ -26,42 +26,15 @@ public class SidedEnergyDevice<T extends IEnergyDevice>{
         return device != null && device.getSavedCurrentPerHour() + current <= device.getMaxCurrent();
     }
 
-    public static <T extends IEnergyDevice> SidedEnergyDevice<T> createSidedEmpty(Class<T> deviceClass, float voltage, float maxSavableCurrent){
-        SidedEnergyDevice<T> device = new SidedEnergyDevice<T>();
-        T energyDevice = null;
-        try{
-            energyDevice = deviceClass.getConstructor(float.class, float.class).newInstance(voltage, maxSavableCurrent);
-        } catch(InstantiationException e){
-            e.printStackTrace();
-        } catch(IllegalAccessException e){
-            e.printStackTrace();
-        } catch(InvocationTargetException e){
-            e.printStackTrace();
-        } catch(NoSuchMethodException e){
-            e.printStackTrace();
-        }
-        for(EnumFacing side : EnumFacing.values()){
-            device.add(energyDevice, side);
-        }
-        return device;
-    }
-
     public static <T extends IEnergyDevice> SidedEnergyDevice<T> createSingleEmpty(Class<T> deviceClass, float voltage, float maxSavableCurrent){
-        SidedEnergyDevice<T> device = new SidedEnergyDevice<T>();
-        T energyDevice = null;
+        SidedEnergyDevice<T> device = new SidedEnergyDevice<>();
         try{
-            energyDevice = deviceClass.getConstructor(float.class, float.class).newInstance(voltage, maxSavableCurrent);
-        } catch(InstantiationException e){
+            T energyDevice = deviceClass.getConstructor(float.class, float.class).newInstance(voltage, maxSavableCurrent);
+            for(EnumFacing side : EnumFacing.values()){
+                device.add(energyDevice, side);
+            }
+        } catch(Exception e){
             e.printStackTrace();
-        } catch(IllegalAccessException e){
-            e.printStackTrace();
-        } catch(InvocationTargetException e){
-            e.printStackTrace();
-        } catch(NoSuchMethodException e){
-            e.printStackTrace();
-        }
-        for(EnumFacing side : EnumFacing.values()){
-            device.add(energyDevice, side);
         }
         return device;
     }
@@ -81,15 +54,9 @@ public class SidedEnergyDevice<T extends IEnergyDevice>{
         for(EnumFacing side : EnumFacing.values()){
             if(nbt.hasKey(side.getName())){
                 try{
-                    Class<T> deviceClass = (Class<T>) Class.forName(nbt.getString(side.getName() + "Class"));
-                    T device = deviceClass.newInstance();
+                    T device = getDeviceForSide(side);
                     device.deserializeNBT((NBTTagCompound) nbt.getTag(side.getName()));
-                    add(device, side);
-                } catch(ClassNotFoundException e){
-                    e.printStackTrace();
-                } catch(IllegalAccessException e){
-                    e.printStackTrace();
-                } catch(InstantiationException e){
+                } catch(Exception e){
                     e.printStackTrace();
                 }
             }

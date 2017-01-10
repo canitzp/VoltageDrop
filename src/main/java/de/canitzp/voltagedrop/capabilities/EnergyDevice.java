@@ -122,6 +122,7 @@ public class EnergyDevice implements IEnergyDevice{
 
     @Override
     public void deserializeNBT(NBTTagCompound nbt){
+        System.out.println(nbt);
         this.voltage = nbt.getFloat("Voltage");
         this.currentCurrent = nbt.getFloat("Current");
         this.maxCurrentCurrent = nbt.getFloat("MaxCurrent");

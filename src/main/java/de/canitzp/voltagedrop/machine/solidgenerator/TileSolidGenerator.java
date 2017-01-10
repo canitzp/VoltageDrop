@@ -1,16 +1,15 @@
 package de.canitzp.voltagedrop.machine.solidgenerator;
 
-import de.canitzp.voltagedrop.VoltageDrop;
+import de.canitzp.ctpcore.util.NBTSaveType;
 import de.canitzp.voltagedrop.capabilities.GeneratorEnergyDevice;
 import de.canitzp.voltagedrop.capabilities.SidedEnergyDevice;
 import de.canitzp.voltagedrop.tile.TileEntityDevice;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.ITickable;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 
 import java.util.List;
@@ -25,7 +24,7 @@ public class TileSolidGenerator extends TileEntityDevice<GeneratorEnergyDevice>{
     private int timeLeft;
 
     public TileSolidGenerator(){
-        super(new ResourceLocation(VoltageDrop.MODID, "solid_generator"), SidedEnergyDevice.createSingleEmpty(GeneratorEnergyDevice.class, 230, 15));
+        super("solid_generator", SidedEnergyDevice.createSingleEmpty(GeneratorEnergyDevice.class, 230, 15));
     }
 
     @Override
@@ -38,7 +37,7 @@ public class TileSolidGenerator extends TileEntityDevice<GeneratorEnergyDevice>{
                     ItemStack stack = item.getEntityItem();
                     if(TileEntityFurnace.isItemFuel(stack)){
                         if(checkForBurn(stack)){
-                            this.spawnParticle(EnumParticleTypes.CRIT_MAGIC, item.getPosition().getX(), item.getPosition().getY() +0.5, item.getPosition().getZ(), 50, 0.25D, new int[0]);
+                            this.spawnParticle(EnumParticleTypes.CRIT_MAGIC, item.getPosition().getX(), item.getPosition().getY() + 0.5, item.getPosition().getZ(), 50, 0.25D, new int[0]);
                         }
                     }
                 }
@@ -46,6 +45,11 @@ public class TileSolidGenerator extends TileEntityDevice<GeneratorEnergyDevice>{
             if(timeLeft > 0){
                 timeLeft--;
                 this.sidedEnergyDevice.getDeviceForSide(EnumFacing.NORTH).generate(230, CURRENT_TO_GEN);
+                if(timeLeft % 10 == 0){
+                    this.syncToClient();
+                }
+            } else if(world.getTotalWorldTime() % 40 == 0){
+                this.syncToClient();
             }
             super.pushEnergy();
         }
@@ -61,6 +65,18 @@ public class TileSolidGenerator extends TileEntityDevice<GeneratorEnergyDevice>{
             }
         }
         return false;
+    }
+
+    @Override
+    public void writeToNBT(NBTTagCompound compound, NBTSaveType type){
+        compound.setInteger("BurnTimeLeft", this.timeLeft);
+        super.writeToNBT(compound, type);
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound compound, NBTSaveType type){
+        this.timeLeft = compound.getInteger("BurnTimeLeft");
+        super.readFromNBT(compound, type);
     }
 
 }

@@ -30,10 +30,10 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
 
     public SidedEnergyDevice<E> sidedEnergyDevice;
     protected Map<BlockPos, EnumFacing> energyPos = new HashMap<BlockPos, EnumFacing>();
-    protected boolean firstTick = true;
+    protected boolean firstTick;
 
-    public TileEntityDevice(ResourceLocation loc, SidedEnergyDevice<E> sidedEnergyDevice){
-        super(loc);
+    public TileEntityDevice(String name, SidedEnergyDevice<E> sidedEnergyDevice){
+        super(new ResourceLocation(VoltageDrop.MODID, name));
         this.sidedEnergyDevice = sidedEnergyDevice;
     }
 
@@ -76,11 +76,10 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
 
     @Override
     public void update(){
-        if(firstTick){
-            if(!world.isRemote){
-                this.onBlockUpdate();
-                firstTick = false;
-            }
+        if(!firstTick){
+            this.onBlockUpdate();
+            this.syncToClient();
+            firstTick = true;
         }
     }
 
@@ -106,7 +105,6 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
                     float current = Math.min(thisDev.getSavedCurrentPerHour(), device.getMaxFlowCurrent());
                     if(canDevicesTransfer(thisDev, device, voltage, current)){
                         device.receiveEnergy(voltage, thisDev.extractEnergy(voltage, current, false), false);
-                        this.syncToClient();
                     }
                 }
             }
