@@ -78,8 +78,10 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
     public void update(){
         if(!firstTick){
             this.onBlockUpdate();
-            this.syncToClient();
             firstTick = true;
+        }
+        if(!world.isRemote && autoSync() && world.getTotalWorldTime() % 40 == 0){
+            this.syncToClient();
         }
     }
 
@@ -105,6 +107,8 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
                     float current = Math.min(thisDev.getSavedCurrentPerHour(), device.getMaxFlowCurrent());
                     if(canDevicesTransfer(thisDev, device, voltage, current)){
                         device.receiveEnergy(voltage, thisDev.extractEnergy(voltage, current, false), false);
+                        ((TileEntityDevice) world.getTileEntity(entry.getKey())).syncToClient();
+                        this.syncToClient();
                     }
                 }
             }
@@ -124,5 +128,7 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
     public boolean canDevicesTransfer(IEnergyDevice from, IEnergyDevice to, float voltage, float current){
         return from.canExtract() && to.canReceive() && from.extractEnergy(voltage, current, true) > 0 && to.receiveEnergy(voltage, current, true) > 0;
     }
+
+    protected abstract boolean autoSync();
 
 }

@@ -45,14 +45,14 @@ public class TileSolidGenerator extends TileEntityDevice<GeneratorEnergyDevice>{
             if(timeLeft > 0){
                 timeLeft--;
                 this.sidedEnergyDevice.getDeviceForSide(EnumFacing.NORTH).generate(230, CURRENT_TO_GEN);
-                if(timeLeft % 10 == 0){
-                    this.syncToClient();
-                }
-            } else if(world.getTotalWorldTime() % 40 == 0){
-                this.syncToClient();
             }
             super.pushEnergy();
         }
+    }
+
+    @Override
+    protected boolean autoSync(){
+        return true;
     }
 
     private boolean checkForBurn(ItemStack stack){

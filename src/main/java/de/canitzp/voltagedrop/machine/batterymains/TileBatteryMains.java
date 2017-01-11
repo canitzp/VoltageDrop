@@ -20,12 +20,11 @@ public class TileBatteryMains extends TileEntityDevice<EnergyDevice>{
     public void update(){
         super.update();
         super.pushEnergy();
-        if(!world.isRemote && world.getTotalWorldTime() % 10 == 0){
-            if(this.sidedEnergyDevice.getDeviceForSide(EnumFacing.NORTH).currentCurrent != cachedCurrent){
-                cachedCurrent = this.sidedEnergyDevice.getDeviceForSide(EnumFacing.NORTH).currentCurrent;
-                this.syncToClient();
-            }
-        }
+    }
+
+    @Override
+    protected boolean autoSync(){
+        return true;
     }
 
 }

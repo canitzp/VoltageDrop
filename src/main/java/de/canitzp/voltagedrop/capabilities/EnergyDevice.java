@@ -12,7 +12,7 @@ public class EnergyDevice implements IEnergyDevice{
     public float maxCurrentCurrent;
 
     public float voltageTolerance = 5;
-    public float maxFlowCurrent = 3;
+    public float maxFlowCurrent = 0.25F;
 
     public EnergyDevice(){}
 
