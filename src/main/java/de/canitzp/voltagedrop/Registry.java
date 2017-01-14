@@ -14,10 +14,14 @@ import net.minecraft.util.ResourceLocation;
  */
 public class Registry{
 
+    public static BlockSolidGenerator solidGenerator;
+    public static BlockBatteryMains batteryMains;
+    public static BlockElectricFurnace electricFurnace;
+
     public static void preInit(){
-        MCRegistry.register(new BlockSolidGenerator());
-        MCRegistry.register(new BlockBatteryMains());
-        MCRegistry.register(new BlockElectricFurnace());
+        MCRegistry.register(solidGenerator = new BlockSolidGenerator());
+        MCRegistry.register(batteryMains = new BlockBatteryMains());
+        MCRegistry.register(electricFurnace = new BlockElectricFurnace());
     }
 
 }

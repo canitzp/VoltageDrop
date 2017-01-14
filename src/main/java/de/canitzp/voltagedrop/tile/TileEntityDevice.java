@@ -30,7 +30,7 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
 
     public SidedEnergyDevice<E> sidedEnergyDevice;
     protected Map<BlockPos, EnumFacing> energyPos = new HashMap<BlockPos, EnumFacing>();
-    protected boolean firstTick;
+    public int ticks;
 
     public TileEntityDevice(String name, SidedEnergyDevice<E> sidedEnergyDevice){
         super(new ResourceLocation(VoltageDrop.MODID, name));
@@ -76,13 +76,13 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
 
     @Override
     public void update(){
-        if(!firstTick){
+        if(ticks == 0){
             this.onBlockUpdate();
-            firstTick = true;
         }
         if(!world.isRemote && autoSync() && world.getTotalWorldTime() % 40 == 0){
             this.syncToClient();
         }
+        ticks++;
     }
 
 
@@ -115,20 +115,14 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
         }
     }
 
-    public EnumFacing getSideFromBlocks(BlockPos pos1, BlockPos pos2){
-        Vec3i vec =  pos2.subtract(pos1);
-        if(vec.getY() == -1) return EnumFacing.UP;
-        else if(vec.getY() == 1) return EnumFacing.DOWN;
-        else if(vec.getX() == -1) return EnumFacing.WEST;
-        else if(vec.getX() == 1) return EnumFacing.EAST;
-        else if(vec.getZ() == -1) return EnumFacing.NORTH;
-        else return EnumFacing.SOUTH;
-    }
-
     public boolean canDevicesTransfer(IEnergyDevice from, IEnergyDevice to, float voltage, float current){
         return from.canExtract() && to.canReceive() && from.extractEnergy(voltage, current, true) > 0 && to.receiveEnergy(voltage, current, true) > 0;
     }
 
     protected abstract boolean autoSync();
 
+    @Override
+    public boolean canSync(){
+        return this.ticks >= 100;
+    }
 }

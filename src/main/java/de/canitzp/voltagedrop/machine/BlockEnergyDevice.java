@@ -7,7 +7,9 @@ import de.canitzp.voltagedrop.capabilities.EnergyDeviceUtil;
 import de.canitzp.voltagedrop.render.IInfoRender;
 import de.canitzp.voltagedrop.tile.TileEntityDevice;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockPistonBase;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -29,6 +31,7 @@ public abstract class BlockEnergyDevice extends BlockContainerBase implements II
 
     public BlockEnergyDevice(Material material, String name, Class<? extends TileEntityBase> tileClass){
         super(material, new ResourceLocation(VoltageDrop.MODID, name), tileClass);
+        this.setCreativeTab(VoltageDrop.tab);
     }
 
     @Override

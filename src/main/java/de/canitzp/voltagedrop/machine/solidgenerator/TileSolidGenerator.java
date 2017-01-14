@@ -19,12 +19,12 @@ import java.util.List;
  */
 public class TileSolidGenerator extends TileEntityDevice<GeneratorEnergyDevice>{
 
-    public static final float CURRENT_TO_GEN = 0.001F;
+    public static final float CURRENT_TO_GEN = 0.1F;
 
     private int timeLeft;
 
     public TileSolidGenerator(){
-        super("solid_generator", SidedEnergyDevice.createSingleEmpty(GeneratorEnergyDevice.class, 230, 15));
+        super("solid_generator", SidedEnergyDevice.createSingleEmpty(GeneratorEnergyDevice.class, 230, 100));
     }
 
     @Override

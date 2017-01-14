@@ -10,10 +10,8 @@ import net.minecraft.util.EnumFacing;
  */
 public class TileBatteryMains extends TileEntityDevice<EnergyDevice>{
 
-    private float cachedCurrent;
-
     public TileBatteryMains(){
-        super("battery_mains", SidedEnergyDevice.createSingleEmpty(EnergyDevice.class, 230, 5000));
+        super("battery_mains", SidedEnergyDevice.createSingleEmpty(EnergyDevice.class, 230, 750));
     }
 
     @Override

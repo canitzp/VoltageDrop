@@ -3,13 +3,14 @@ package de.canitzp.voltagedrop.machine.furnace;
 import de.canitzp.ctpcore.inventory.GuiContainerBase;
 import de.canitzp.voltagedrop.VoltageDrop;
 import de.canitzp.voltagedrop.machine.GuiContainerDevice;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 
 /**
  * @author canitzp
  */
-public class GuiElectricFurnace extends GuiContainerDevice{
+public class GuiElectricFurnace extends GuiContainerDevice<TileElectricFurnace>{
 
     public static final ResourceLocation RESOURCE_LOCATION = new ResourceLocation(VoltageDrop.MODID, "textures/gui/electric_furnace.png");
 
@@ -24,7 +25,7 @@ public class GuiElectricFurnace extends GuiContainerDevice{
         this.clearColor();
         this.drawBackgroundLocation(RESOURCE_LOCATION);
         this.drawEnergyBar(7, 7);
+        this.drawHorizontalBar(32, 39, 3, 166, 108, getScale(this.tile.getTimeLeft(), this.tile.getMaxTime(), 7));
     }
-
 
 }

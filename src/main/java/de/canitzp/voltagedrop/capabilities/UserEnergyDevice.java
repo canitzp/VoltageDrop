@@ -15,4 +15,13 @@ public class UserEnergyDevice extends EnergyDevice{
     public boolean canExtract(){
         return false;
     }
+
+    public float useEnergy(float voltage, float current){
+        if(!this.isVoltageCorrect(voltage)){
+            return -1;
+        }
+        float energyReceived = Math.min(this.currentCurrent, Math.min(this.maxFlowCurrent, current));
+        this.currentCurrent -= energyReceived;
+        return energyReceived;
+    }
 }

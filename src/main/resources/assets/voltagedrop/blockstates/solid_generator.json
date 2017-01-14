@@ -8,7 +8,7 @@
             "down": "voltagedrop:blocks/machine_topdown",
             "up": "#down",
             "south": "#particle",
-            "north": "voltagedrop:blocks/electric_furnace_front",
+            "north": "voltagedrop:blocks/solid_generator_front",
             "east": "#particle",
             "west": "#particle"
         }

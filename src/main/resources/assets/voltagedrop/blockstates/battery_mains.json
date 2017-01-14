@@ -4,11 +4,11 @@
         "model": "minecraft:cube",
         "transform": "forge:default-block",
         "textures": {
-            "particle": "voltagedrop:blocks/machine_side",
-            "down": "voltagedrop:blocks/machine_topdown",
+            "particle": "voltagedrop:blocks/battery_mains_side",
+            "down": "voltagedrop:blocks/battery_mains_top",
             "up": "#down",
             "south": "#particle",
-            "north": "voltagedrop:blocks/electric_furnace_front",
+            "north": "voltagedrop:blocks/battery_mains_front",
             "east": "#particle",
             "west": "#particle"
         }
