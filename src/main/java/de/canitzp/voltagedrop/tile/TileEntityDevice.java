@@ -7,6 +7,9 @@ import de.canitzp.voltagedrop.capabilities.Capabilities;
 import de.canitzp.voltagedrop.capabilities.EnergyDevice;
 import de.canitzp.voltagedrop.capabilities.IEnergyDevice;
 import de.canitzp.voltagedrop.capabilities.SidedEnergyDevice;
+import de.canitzp.voltagedrop.machine.transformer.BlockTransformer;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
@@ -15,6 +18,7 @@ import net.minecraft.util.ITickable;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
+import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 
 import javax.annotation.Nullable;
@@ -29,12 +33,11 @@ import java.util.Map;
 public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEntityBase implements ITickable{
 
     public SidedEnergyDevice<E> sidedEnergyDevice;
-    protected Map<BlockPos, EnumFacing> energyPos = new HashMap<BlockPos, EnumFacing>();
+    protected Map<BlockPos, EnumFacing> energyPos = new HashMap<>();
     public int ticks;
 
-    public TileEntityDevice(String name, SidedEnergyDevice<E> sidedEnergyDevice){
+    public TileEntityDevice(String name){
         super(new ResourceLocation(VoltageDrop.MODID, name));
-        this.sidedEnergyDevice = sidedEnergyDevice;
     }
 
     @Override
@@ -56,20 +59,24 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
 
     @Override
     public void writeToNBT(NBTTagCompound compound, NBTSaveType type){
-        if(type == NBTSaveType.SAVE || type == NBTSaveType.DROP_BLOCK){
-            compound = this.sidedEnergyDevice.write(compound);
-        } else {
-            compound = this.sidedEnergyDevice.sync(compound);
+        if(this.sidedEnergyDevice != null){
+            if(type == NBTSaveType.SAVE || type == NBTSaveType.DROP_BLOCK){
+                compound = this.sidedEnergyDevice.write(compound);
+            } else {
+                compound = this.sidedEnergyDevice.sync(compound);
+            }
         }
         super.writeToNBT(compound, type);
     }
 
     @Override
     public void readFromNBT(NBTTagCompound compound, NBTSaveType type){
-        if(type == NBTSaveType.SAVE || type == NBTSaveType.DROP_BLOCK){
-            this.sidedEnergyDevice.read(compound);
-        } else {
-            this.sidedEnergyDevice.getSync(compound);
+        if(this.sidedEnergyDevice != null){
+            if(type == NBTSaveType.SAVE || type == NBTSaveType.DROP_BLOCK){
+                this.sidedEnergyDevice.read(compound);
+            } else {
+                this.sidedEnergyDevice.getSync(compound);
+            }
         }
         super.readFromNBT(compound, type);
     }
@@ -77,6 +84,7 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
     @Override
     public void update(){
         if(ticks == 0){
+            setSidedEnergyIfNull();
             this.onBlockUpdate();
         }
         if(!world.isRemote && autoSync() && world.getTotalWorldTime() % 40 == 0){
@@ -84,7 +92,6 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
         }
         ticks++;
     }
-
 
     public void onBlockUpdate(){
         this.energyPos.clear();
@@ -95,6 +102,10 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
                 this.energyPos.put(pos, side.getOpposite());
             }
         }
+    }
+
+    public void onBlockPlaced(){
+        setSidedEnergyIfNull();
     }
 
     protected void pushEnergy(){
@@ -125,4 +136,26 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
     public boolean canSync(){
         return this.ticks >= 100;
     }
+
+    public EnumFacing getFacings(){
+        IBlockState state = getWorld().getBlockState(getPos());
+        if(state.getBlock() instanceof BlockTransformer){
+            return state.getValue(((BlockTransformer) state.getBlock()).getFacing()).getVanillaFacing();
+        }
+        return EnumFacing.NORTH;
+    }
+
+    public void onBlockChanged(@Nullable EntityPlayer player){
+        //TODO for wrench rotation
+    }
+
+    protected abstract SidedEnergyDevice<E> getSidedEnergyDevice(World world, BlockPos pos);
+
+    protected void setSidedEnergyIfNull(){
+        System.out.println(this.sidedEnergyDevice);
+        if(this.sidedEnergyDevice == null){
+            this.sidedEnergyDevice = getSidedEnergyDevice(this.world, this.pos);
+        }
+    }
+
 }

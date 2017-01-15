@@ -4,6 +4,8 @@ import de.canitzp.voltagedrop.capabilities.EnergyDevice;
 import de.canitzp.voltagedrop.capabilities.SidedEnergyDevice;
 import de.canitzp.voltagedrop.tile.TileEntityDevice;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 /**
  * @author canitzp
@@ -11,7 +13,7 @@ import net.minecraft.util.EnumFacing;
 public class TileBatteryMains extends TileEntityDevice<EnergyDevice>{
 
     public TileBatteryMains(){
-        super("battery_mains", SidedEnergyDevice.createSingleEmpty(EnergyDevice.class, 230, 750));
+        super("battery_mains");
     }
 
     @Override
@@ -23,6 +25,11 @@ public class TileBatteryMains extends TileEntityDevice<EnergyDevice>{
     @Override
     protected boolean autoSync(){
         return true;
+    }
+
+    @Override
+    protected SidedEnergyDevice<EnergyDevice> getSidedEnergyDevice(World world, BlockPos pos){
+        return SidedEnergyDevice.createSingleEmpty(EnergyDevice.class, 230, 750);
     }
 
 }

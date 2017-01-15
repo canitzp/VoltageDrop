@@ -1,7 +1,9 @@
 package de.canitzp.voltagedrop.capabilities;
 
+import de.canitzp.voltagedrop.tile.TileEntityDevice;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
 
@@ -12,8 +14,13 @@ public class SidedEnergyDevice<T extends IEnergyDevice>{
 
     private T[] sidedDevices = (T[]) new IEnergyDevice[6];
 
-    public SidedEnergyDevice add(T device, EnumFacing side){
+    public SidedEnergyDevice<T> add(T device, EnumFacing side){
         this.sidedDevices[side.ordinal()] = device;
+        return this;
+    }
+
+    public SidedEnergyDevice<T> clear(){
+        this.sidedDevices = (T[]) new IEnergyDevice[6];
         return this;
     }
 
@@ -55,14 +62,15 @@ public class SidedEnergyDevice<T extends IEnergyDevice>{
             if(nbt.hasKey(side.getName())){
                 try{
                     T device = getDeviceForSide(side);
-                    device.deserializeNBT((NBTTagCompound) nbt.getTag(side.getName()));
+                    if(device != null){
+                        device.deserializeNBT((NBTTagCompound) nbt.getTag(side.getName()));
+                    }
                 } catch(Exception e){
                     e.printStackTrace();
                 }
             }
         }
     }
-
 
     public NBTTagCompound sync(NBTTagCompound nbt){
         for(EnumFacing side : EnumFacing.values()){

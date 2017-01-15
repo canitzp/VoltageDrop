@@ -5,6 +5,8 @@ import de.canitzp.ctpcore.registry.MCRegistry;
 import de.canitzp.voltagedrop.machine.batterymains.BlockBatteryMains;
 import de.canitzp.voltagedrop.machine.furnace.BlockElectricFurnace;
 import de.canitzp.voltagedrop.machine.solidgenerator.BlockSolidGenerator;
+import de.canitzp.voltagedrop.machine.transformer.BlockTransformer;
+import de.canitzp.voltagedrop.machine.transformer.basic.BlockTrafoBasic;
 import de.canitzp.voltagedrop.tile.TileEntityDevice;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.ResourceLocation;
@@ -17,11 +19,13 @@ public class Registry{
     public static BlockSolidGenerator solidGenerator;
     public static BlockBatteryMains batteryMains;
     public static BlockElectricFurnace electricFurnace;
+    public static BlockTransformer trafoBasic;
 
     public static void preInit(){
         MCRegistry.register(solidGenerator = new BlockSolidGenerator());
         MCRegistry.register(batteryMains = new BlockBatteryMains());
         MCRegistry.register(electricFurnace = new BlockElectricFurnace());
+        MCRegistry.register(trafoBasic = new BlockTrafoBasic());
     }
 
 }

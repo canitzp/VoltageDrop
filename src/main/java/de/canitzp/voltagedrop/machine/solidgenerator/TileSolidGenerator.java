@@ -11,6 +11,8 @@ import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 import java.util.List;
 
@@ -19,12 +21,12 @@ import java.util.List;
  */
 public class TileSolidGenerator extends TileEntityDevice<GeneratorEnergyDevice>{
 
-    public static final float CURRENT_TO_GEN = 0.1F;
+    public static final float CURRENT_TO_GEN = 0.01F;
 
     private int timeLeft;
 
     public TileSolidGenerator(){
-        super("solid_generator", SidedEnergyDevice.createSingleEmpty(GeneratorEnergyDevice.class, 230, 100));
+        super("solid_generator");
     }
 
     @Override
@@ -53,6 +55,11 @@ public class TileSolidGenerator extends TileEntityDevice<GeneratorEnergyDevice>{
     @Override
     protected boolean autoSync(){
         return true;
+    }
+
+    @Override
+    protected SidedEnergyDevice<GeneratorEnergyDevice> getSidedEnergyDevice(World world, BlockPos pos){
+        return SidedEnergyDevice.createSingleEmpty(GeneratorEnergyDevice.class, 230, 100);
     }
 
     private boolean checkForBurn(ItemStack stack){

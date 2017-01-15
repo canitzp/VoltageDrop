@@ -14,6 +14,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
@@ -34,12 +36,17 @@ public class TileElectricFurnace extends TileEntityDevice<UserEnergyDevice>{
     private ItemStack burnStack = ItemStack.EMPTY;
 
     public TileElectricFurnace(){
-        super("electric_furnace", SidedEnergyDevice.createSingleEmpty(UserEnergyDevice.class, 230, 5));
+        super("electric_furnace");
     }
 
     @Override
     protected boolean autoSync(){
         return true;
+    }
+
+    @Override
+    protected SidedEnergyDevice<UserEnergyDevice> getSidedEnergyDevice(World world, BlockPos pos){
+        return SidedEnergyDevice.createSingleEmpty(UserEnergyDevice.class, 230, 5);
     }
 
     @Nullable
