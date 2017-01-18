@@ -1,7 +1,8 @@
 package de.canitzp.voltagedrop.machine.transformer;
 
 import de.canitzp.voltagedrop.capabilities.SidedEnergyDevice;
-import de.canitzp.voltagedrop.capabilities.TransformerDevice;
+import de.canitzp.voltagedrop.capabilities.UserEnergyDevice;
+import de.canitzp.voltagedrop.capabilities.Voltages;
 import de.canitzp.voltagedrop.tile.TileEntityDevice;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -9,12 +10,12 @@ import net.minecraft.world.World;
 /**
  * @author canitzp
  */
-public abstract class TileTransformer extends TileEntityDevice<TransformerDevice>{
+//TODO rework transformer
+public abstract class TileTransformer extends TileEntityDevice<UserEnergyDevice>{
 
-    private float inputVoltage, outputVoltage;
+    private Voltages inputVoltage, outputVoltage;
 
-    public TileTransformer(String name, float inputVoltage, float outputVoltage){
-        super("transformer_".concat(name));
+    public TileTransformer(Voltages inputVoltage, Voltages outputVoltage){
         this.inputVoltage = inputVoltage;
         this.outputVoltage = outputVoltage;
     }
@@ -23,16 +24,16 @@ public abstract class TileTransformer extends TileEntityDevice<TransformerDevice
     public void update(){
         super.update();
         if(!this.world.isRemote){
-            TransformerDevice device = this.sidedEnergyDevice.getDeviceForSide(this.getFacings());
+            UserEnergyDevice device = this.getDeviceForSide(this.getFacings());
             if(device != null){
-                device.updateTransformer(this);
+                //device.updateTransformer(this);
             }
         }
     }
 
     @Override
-    protected SidedEnergyDevice<TransformerDevice> getSidedEnergyDevice(World world, BlockPos pos){
-        return TransformerDevice.createTransformer(inputVoltage, outputVoltage, this.getFacings());
+    protected SidedEnergyDevice<UserEnergyDevice> getSidedEnergyDevice(World world, BlockPos pos){
+        return SidedEnergyDevice.createSingleEmpty(UserEnergyDevice.class, Voltages.MAINS, 50); //TransformerDevice.createTransformer(inputVoltage, outputVoltage, this.getFacings());
     }
 
     @Override

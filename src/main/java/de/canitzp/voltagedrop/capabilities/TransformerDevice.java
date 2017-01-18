@@ -1,15 +1,12 @@
 package de.canitzp.voltagedrop.capabilities;
 
-import de.canitzp.ctpcore.util.MathUtil;
-import de.canitzp.voltagedrop.Util;
-import de.canitzp.voltagedrop.machine.transformer.TileTransformer;
-import net.minecraft.util.EnumFacing;
-
 /**
  * @author canitzp
  */
+//TODO rewrite this whole thing
 public class TransformerDevice extends EnergyDevice{
 
+    /*
     private float inputVoltage, outputVoltage;
     private boolean isInputSide;
 
@@ -52,7 +49,7 @@ public class TransformerDevice extends EnergyDevice{
         if(this.isInputSide){
             TransformerDevice output = transformer.sidedEnergyDevice.getDeviceForSide(transformer.getFacings().getOpposite());
             if(output != null){
-                this.extract(output.insert(Util.calculateCurrent(this.inputVoltage, this.outputVoltage, this.getSavedCurrentPerHour())));
+                this.extract(output.insert(Util.calculateCurrent(this.inputVoltage, this.outputVoltage, this.getStored())));
             }
         }
     }
@@ -68,5 +65,6 @@ public class TransformerDevice extends EnergyDevice{
         this.currentCurrent -= energyReceived;
         return energyReceived;
     }
+    */
 
 }

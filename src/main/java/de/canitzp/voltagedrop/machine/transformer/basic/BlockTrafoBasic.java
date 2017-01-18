@@ -1,5 +1,6 @@
 package de.canitzp.voltagedrop.machine.transformer.basic;
 
+import de.canitzp.voltagedrop.capabilities.Voltages;
 import de.canitzp.voltagedrop.machine.transformer.BlockTransformer;
 import de.canitzp.voltagedrop.machine.transformer.TileTransformer;
 import net.minecraft.block.material.Material;
@@ -15,7 +16,7 @@ public class BlockTrafoBasic extends BlockTransformer{
 
     public static class Tile extends TileTransformer{
         public Tile(){
-            super("basic", 230, 5);
+            super(Voltages.MAINS, Voltages.LOW);
         }
     }
 

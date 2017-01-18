@@ -7,7 +7,7 @@ public class GeneratorEnergyDevice extends EnergyDevice{
 
     public GeneratorEnergyDevice(){}
 
-    public GeneratorEnergyDevice(float voltage, float maxCurrentCurrent){
+    public GeneratorEnergyDevice(Voltages voltage, float maxCurrentCurrent){
         super(voltage, maxCurrentCurrent);
     }
 
@@ -16,12 +16,12 @@ public class GeneratorEnergyDevice extends EnergyDevice{
         return false;
     }
 
-    public float generate(float voltage, float current){
-        if(!super.isVoltageCorrect(voltage)){
-            return -1;
+    public ErrorTypes generate(Voltages voltage, float current){
+        if(!checkVoltageRating(voltage).equals(ErrorTypes.OK)){
+            return checkVoltageRating(voltage);
         }
-        float energyReceived = Math.min(this.maxCurrentCurrent - this.currentCurrent, Math.min(this.maxFlowCurrent, current));
-        this.currentCurrent += energyReceived;
-        return energyReceived;
+        float energyReceived = Math.min(this.getMaxStoreable() - this.getStored(), Math.min(this.getMaxFlow(), current));
+        this.curentEnergy += energyReceived;
+        return ErrorTypes.setOK(energyReceived);
     }
 }

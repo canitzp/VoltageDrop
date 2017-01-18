@@ -31,7 +31,7 @@ public abstract class GuiContainerDevice<T extends TileEntityBase> extends GuiCo
         if(this.tile.hasCapability(Capabilities.ENERGY, EnumFacing.NORTH)){
             IEnergyDevice device = this.tile.getCapability(Capabilities.ENERGY, EnumFacing.NORTH);
             if(device != null){
-                this.drawEnergyBar(x, y, device.getSavedCurrentPerHour(), device.getMaxCurrent());
+                this.drawEnergyBar(x, y, device.getStored(), device.getMaxStoreable());
             }
         }
     }

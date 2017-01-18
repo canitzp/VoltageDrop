@@ -7,7 +7,7 @@ public class UserEnergyDevice extends EnergyDevice{
 
     public UserEnergyDevice(){}
 
-    public UserEnergyDevice(float voltage, float maxCurrentCurrent){
+    public UserEnergyDevice(Voltages voltage, float maxCurrentCurrent){
         super(voltage, maxCurrentCurrent);
     }
 
@@ -16,12 +16,12 @@ public class UserEnergyDevice extends EnergyDevice{
         return false;
     }
 
-    public float useEnergy(float voltage, float current){
-        if(!this.isVoltageCorrect(voltage)){
-            return -1;
+    public ErrorTypes useEnergy(Voltages voltage, float current){
+        if(!checkVoltageRating(voltage).equals(ErrorTypes.OK)){
+            return checkVoltageRating(voltage);
         }
-        float energyReceived = Math.min(this.currentCurrent, Math.min(this.maxFlowCurrent, current));
-        this.currentCurrent -= energyReceived;
-        return energyReceived;
+        float energyReceived = Math.min(this.getStored(), Math.min(this.getMaxFlow(), current));
+        this.curentEnergy -= energyReceived;
+        return ErrorTypes.setOK(energyReceived);
     }
 }

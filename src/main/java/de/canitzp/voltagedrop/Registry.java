@@ -1,15 +1,11 @@
 package de.canitzp.voltagedrop;
 
-import de.canitzp.ctpcore.base.BlockContainerBase;
 import de.canitzp.ctpcore.registry.MCRegistry;
-import de.canitzp.voltagedrop.machine.batterymains.BlockBatteryMains;
+import de.canitzp.voltagedrop.machine.battery.batterymains.BlockBatteryMains;
 import de.canitzp.voltagedrop.machine.furnace.BlockElectricFurnace;
 import de.canitzp.voltagedrop.machine.solidgenerator.BlockSolidGenerator;
 import de.canitzp.voltagedrop.machine.transformer.BlockTransformer;
 import de.canitzp.voltagedrop.machine.transformer.basic.BlockTrafoBasic;
-import de.canitzp.voltagedrop.tile.TileEntityDevice;
-import net.minecraft.block.material.Material;
-import net.minecraft.util.ResourceLocation;
 
 /**
  * @author canitzp

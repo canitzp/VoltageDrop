@@ -7,8 +7,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 
-import java.util.concurrent.Callable;
-
 /**
  * @author canitzp
  */
@@ -21,19 +19,14 @@ public class Capabilities{
         CapabilityManager.INSTANCE.register(IEnergyDevice.class, new Capability.IStorage<IEnergyDevice>(){
             @Override
             public NBTBase writeNBT(Capability<IEnergyDevice> capability, IEnergyDevice instance, EnumFacing side){
-                return new NBTTagFloat(instance.getSavedCurrentPerHour());
+                return new NBTTagFloat(instance.getStored());
             }
 
             @Override
             public void readNBT(Capability<IEnergyDevice> capability, IEnergyDevice instance, EnumFacing side, NBTBase nbt){
-                instance.setSavedCurrentPerHour(((NBTTagFloat)nbt).getFloat());
+                instance.setStored(((NBTTagFloat)nbt).getFloat());
             }
-        }, new Callable<IEnergyDevice>(){
-            @Override
-            public IEnergyDevice call() throws Exception{
-                return new EnergyDevice(230, 0);
-            }
-        });
+        }, () -> new EnergyDevice(Voltages.MAINS, 0));
     }
 
 }

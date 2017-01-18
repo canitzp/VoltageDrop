@@ -2,29 +2,20 @@ package de.canitzp.voltagedrop.tile;
 
 import de.canitzp.ctpcore.base.TileEntityBase;
 import de.canitzp.ctpcore.util.NBTSaveType;
-import de.canitzp.voltagedrop.VoltageDrop;
-import de.canitzp.voltagedrop.capabilities.Capabilities;
-import de.canitzp.voltagedrop.capabilities.EnergyDevice;
-import de.canitzp.voltagedrop.capabilities.IEnergyDevice;
-import de.canitzp.voltagedrop.capabilities.SidedEnergyDevice;
+import de.canitzp.voltagedrop.capabilities.*;
 import de.canitzp.voltagedrop.machine.transformer.BlockTransformer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,13 +23,10 @@ import java.util.Map;
  */
 public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEntityBase implements ITickable{
 
+    @Deprecated
     public SidedEnergyDevice<E> sidedEnergyDevice;
     protected Map<BlockPos, EnumFacing> energyPos = new HashMap<>();
     public int ticks;
-
-    public TileEntityDevice(String name){
-        super(new ResourceLocation(VoltageDrop.MODID, name));
-    }
 
     @Override
     public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing){
@@ -49,7 +37,7 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
     @Override
     public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing){
         if(capability.equals(Capabilities.ENERGY)){
-            IEnergyDevice device = this.sidedEnergyDevice.getDeviceForSide(facing);
+            IEnergyDevice device = this.getDeviceForSide(facing);
             if(device != null){
                 return (T) device;
             }
@@ -113,11 +101,11 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
             for(Map.Entry<BlockPos, EnumFacing> entry : energyPos.entrySet()){
                 IEnergyDevice device = world.getTileEntity(entry.getKey()).getCapability(Capabilities.ENERGY, entry.getValue());
                 if(device != null){
-                    IEnergyDevice thisDev = this.sidedEnergyDevice.getDeviceForSide(entry.getValue().getOpposite());
-                    float voltage = thisDev.getOutputVoltage();
-                    float current = Math.min(thisDev.getSavedCurrentPerHour(), device.getMaxFlowCurrent());
+                    IEnergyDevice thisDev = this.getDeviceForSide(entry.getValue().getOpposite());
+                    Voltages voltage = thisDev.getVoltage();
+                    float current = Math.min(thisDev.getStored(), device.getMaxFlow());
                     if(canDevicesTransfer(thisDev, device, voltage, current)){
-                        device.receiveEnergy(voltage, thisDev.extractEnergy(voltage, current, false), false);
+                        device.receiveEnergy(voltage, thisDev.extractEnergy(voltage, current, false).energy, false);
                         ((TileEntityDevice) world.getTileEntity(entry.getKey())).syncToClient();
                         this.syncToClient();
                     }
@@ -126,8 +114,8 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
         }
     }
 
-    public boolean canDevicesTransfer(IEnergyDevice from, IEnergyDevice to, float voltage, float current){
-        return from.canExtract() && to.canReceive() && from.extractEnergy(voltage, current, true) > 0 && to.receiveEnergy(voltage, current, true) > 0;
+    public boolean canDevicesTransfer(IEnergyDevice from, IEnergyDevice to, Voltages voltage, float current){
+        return from.canExtract() && to.canReceive() && from.extractEnergy(voltage, current, true).equals(ErrorTypes.OK) && to.receiveEnergy(voltage, current, true).equals(ErrorTypes.OK);
     }
 
     protected abstract boolean autoSync();
@@ -152,10 +140,14 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
     protected abstract SidedEnergyDevice<E> getSidedEnergyDevice(World world, BlockPos pos);
 
     protected void setSidedEnergyIfNull(){
-        System.out.println(this.sidedEnergyDevice);
         if(this.sidedEnergyDevice == null){
             this.sidedEnergyDevice = getSidedEnergyDevice(this.world, this.pos);
         }
+    }
+
+    public E getDeviceForSide(EnumFacing side){
+        return this.sidedEnergyDevice != null ? this.sidedEnergyDevice.getDeviceForSide(side) : null;
+
     }
 
 }

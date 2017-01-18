@@ -9,38 +9,28 @@ import net.minecraftforge.common.util.INBTSerializable;
 public interface IEnergyDevice extends INBTSerializable<NBTTagCompound>{
 
     /**
-     * @return The maximum of output voltage in Volts
+     * @return The maximum voltage for the block
      */
-    float getOutputVoltage();
-
-    /**
-     * @return The maximum input voltage in Volts
-     */
-    float getInputVoltage();
+    Voltages getVoltage();
 
     /**
      * The voltage is equal to the max output voltage.
      * @return The maximum of saveable current per hour in Amps/Hour
      */
-    float getSavedCurrentPerHour();
+    float getStored();
 
-    void setSavedCurrentPerHour(float currentPerHour);
+    void setStored(float currentPerHour);
 
-    /**
-     * @return The devices internal resistance in Ohm
-     */
-    int getInternalResistance();
+    ErrorTypes receiveEnergy(Voltages voltage, float energy, boolean simulate);
 
-    float receiveEnergy(float voltage, float current, boolean simulate);
+    ErrorTypes extractEnergy(Voltages voltage, float energy, boolean simulate);
 
-    float extractEnergy(float voltage, float current, boolean simulate);
-
-    float getMaxCurrent();
+    float getMaxStoreable();
 
     boolean canExtract();
 
     boolean canReceive();
 
-    float getMaxFlowCurrent();
+    float getMaxFlow();
 
 }

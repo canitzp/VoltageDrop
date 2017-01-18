@@ -3,6 +3,7 @@ package de.canitzp.voltagedrop.machine.solidgenerator;
 import de.canitzp.ctpcore.util.NBTSaveType;
 import de.canitzp.voltagedrop.capabilities.GeneratorEnergyDevice;
 import de.canitzp.voltagedrop.capabilities.SidedEnergyDevice;
+import de.canitzp.voltagedrop.capabilities.Voltages;
 import de.canitzp.voltagedrop.tile.TileEntityDevice;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
@@ -25,10 +26,6 @@ public class TileSolidGenerator extends TileEntityDevice<GeneratorEnergyDevice>{
 
     private int timeLeft;
 
-    public TileSolidGenerator(){
-        super("solid_generator");
-    }
-
     @Override
     public void update(){
         super.update();
@@ -46,7 +43,7 @@ public class TileSolidGenerator extends TileEntityDevice<GeneratorEnergyDevice>{
             }
             if(timeLeft > 0){
                 timeLeft--;
-                this.sidedEnergyDevice.getDeviceForSide(EnumFacing.NORTH).generate(230, CURRENT_TO_GEN);
+                this.sidedEnergyDevice.getDeviceForSide(EnumFacing.NORTH).generate(Voltages.MAINS, CURRENT_TO_GEN);
             }
             super.pushEnergy();
         }
@@ -59,7 +56,7 @@ public class TileSolidGenerator extends TileEntityDevice<GeneratorEnergyDevice>{
 
     @Override
     protected SidedEnergyDevice<GeneratorEnergyDevice> getSidedEnergyDevice(World world, BlockPos pos){
-        return SidedEnergyDevice.createSingleEmpty(GeneratorEnergyDevice.class, 230, 100);
+        return SidedEnergyDevice.createSingleEmpty(GeneratorEnergyDevice.class, Voltages.MAINS, 100);
     }
 
     private boolean checkForBurn(ItemStack stack){

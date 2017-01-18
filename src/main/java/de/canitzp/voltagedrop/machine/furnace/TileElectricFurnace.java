@@ -1,17 +1,15 @@
 package de.canitzp.voltagedrop.machine.furnace;
 
-import de.canitzp.ctpcore.registry.IRegistryEntry;
 import de.canitzp.ctpcore.util.NBTSaveType;
 import de.canitzp.ctpcore.util.NBTUtil;
 import de.canitzp.ctpcore.util.StackUtil;
 import de.canitzp.voltagedrop.api.recipe.RecipeElectricFurnace;
 import de.canitzp.voltagedrop.capabilities.SidedEnergyDevice;
 import de.canitzp.voltagedrop.capabilities.UserEnergyDevice;
+import de.canitzp.voltagedrop.capabilities.Voltages;
 import de.canitzp.voltagedrop.tile.TileEntityDevice;
-import mezz.jei.RecipeRegistry;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -21,7 +19,6 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
 import javax.annotation.Nullable;
-import java.util.Map;
 
 /**
  * @author canitzp
@@ -35,10 +32,6 @@ public class TileElectricFurnace extends TileEntityDevice<UserEnergyDevice>{
     private int timeLeft, max;
     private ItemStack burnStack = ItemStack.EMPTY;
 
-    public TileElectricFurnace(){
-        super("electric_furnace");
-    }
-
     @Override
     protected boolean autoSync(){
         return true;
@@ -46,7 +39,7 @@ public class TileElectricFurnace extends TileEntityDevice<UserEnergyDevice>{
 
     @Override
     protected SidedEnergyDevice<UserEnergyDevice> getSidedEnergyDevice(World world, BlockPos pos){
-        return SidedEnergyDevice.createSingleEmpty(UserEnergyDevice.class, 230, 5);
+        return SidedEnergyDevice.createSingleEmpty(UserEnergyDevice.class, Voltages.MAINS, 5);
     }
 
     @Nullable
@@ -72,12 +65,6 @@ public class TileElectricFurnace extends TileEntityDevice<UserEnergyDevice>{
         this.timeLeft = compound.getInteger("TimeLeft");
         this.max = compound.getInteger("TimeMax");
         this.burnStack = NBTUtil.getItemStack(compound, "BurnStack");
-    }
-
-    @Override
-    public void ownRegistry(){
-        super.ownRegistry();
-        RecipeElectricFurnace.processFurnaceRecipes();
     }
 
     @Override
@@ -107,7 +94,7 @@ public class TileElectricFurnace extends TileEntityDevice<UserEnergyDevice>{
                 }
             } else if(timeLeft > 0){
                 timeLeft--;
-                this.sidedEnergyDevice.getDeviceForSide(EnumFacing.NORTH).useEnergy(230, ENERGY_USAGE);
+                this.sidedEnergyDevice.getDeviceForSide(EnumFacing.NORTH).useEnergy(Voltages.MAINS, ENERGY_USAGE);
                 this.syncToClient();
             }
         }

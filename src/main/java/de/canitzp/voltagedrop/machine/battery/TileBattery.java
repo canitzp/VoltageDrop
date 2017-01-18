@@ -1,19 +1,23 @@
-package de.canitzp.voltagedrop.machine.batterymains;
+package de.canitzp.voltagedrop.machine.battery;
 
 import de.canitzp.voltagedrop.capabilities.EnergyDevice;
 import de.canitzp.voltagedrop.capabilities.SidedEnergyDevice;
+import de.canitzp.voltagedrop.capabilities.Voltages;
 import de.canitzp.voltagedrop.tile.TileEntityDevice;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 /**
  * @author canitzp
  */
-public class TileBatteryMains extends TileEntityDevice<EnergyDevice>{
+public class TileBattery extends TileEntityDevice<EnergyDevice>{
 
-    public TileBatteryMains(){
-        super("battery_mains");
+    private Voltages voltage;
+    private float savableCurrent;
+
+    public TileBattery(Voltages voltage, float savableCurrent){
+        this.voltage = voltage;
+        this.savableCurrent = savableCurrent;
     }
 
     @Override
@@ -29,7 +33,7 @@ public class TileBatteryMains extends TileEntityDevice<EnergyDevice>{
 
     @Override
     protected SidedEnergyDevice<EnergyDevice> getSidedEnergyDevice(World world, BlockPos pos){
-        return SidedEnergyDevice.createSingleEmpty(EnergyDevice.class, 230, 750);
+        return SidedEnergyDevice.createSingleEmpty(EnergyDevice.class, this.voltage, this.savableCurrent);
     }
 
 }

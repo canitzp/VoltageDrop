@@ -1,11 +1,7 @@
 package de.canitzp.voltagedrop.capabilities;
 
-import de.canitzp.voltagedrop.tile.TileEntityDevice;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
-import org.apache.commons.lang3.ArrayUtils;
-
-import java.util.Arrays;
 
 /**
  * @author canitzp
@@ -30,13 +26,13 @@ public class SidedEnergyDevice<T extends IEnergyDevice>{
 
     public boolean canStoreCurrent(float current, EnumFacing side){
         T device = getDeviceForSide(side);
-        return device != null && device.getSavedCurrentPerHour() + current <= device.getMaxCurrent();
+        return device != null && device.getStored() + current <= device.getMaxStoreable();
     }
 
-    public static <T extends IEnergyDevice> SidedEnergyDevice<T> createSingleEmpty(Class<T> deviceClass, float voltage, float maxSavableCurrent){
+    public static <T extends IEnergyDevice> SidedEnergyDevice<T> createSingleEmpty(Class<T> deviceClass, Voltages voltage, float maxSavableCurrent){
         SidedEnergyDevice<T> device = new SidedEnergyDevice<>();
         try{
-            T energyDevice = deviceClass.getConstructor(float.class, float.class).newInstance(voltage, maxSavableCurrent);
+            T energyDevice = deviceClass.getConstructor(Voltages.class, float.class).newInstance(voltage, maxSavableCurrent);
             for(EnumFacing side : EnumFacing.values()){
                 device.add(energyDevice, side);
             }
@@ -76,7 +72,7 @@ public class SidedEnergyDevice<T extends IEnergyDevice>{
         for(EnumFacing side : EnumFacing.values()){
             T device = getDeviceForSide(side);
             if(device != null){
-                nbt.setFloat(side.getName(), getDeviceForSide(side).getSavedCurrentPerHour());
+                nbt.setFloat(side.getName(), getDeviceForSide(side).getStored());
             }
         }
         return nbt;
@@ -87,7 +83,7 @@ public class SidedEnergyDevice<T extends IEnergyDevice>{
             if(nbt.hasKey(side.getName())){
                 T device = getDeviceForSide(side);
                 if(device != null){
-                    device.setSavedCurrentPerHour(nbt.getFloat(side.getName()));
+                    device.setStored(nbt.getFloat(side.getName()));
                 }
             }
         }
