@@ -5,19 +5,25 @@ package de.canitzp.voltagedrop.capabilities;
  */
 public enum Voltages{
 
-    LOWEST(3.3F),
-    LOW(5),
-    FAST_CHARGE(9),
-    MAINS(230);
+    LOWEST(3.3F, 6.5F),
+    LOW(5, 6.45F),
+    FAST_CHARGE(9, 6.25F),
+    LAPTOP_CHARGE(19, 6),
+    MAINS(230, 0);
 
-    private float rating;
+    private float rating, conversionRateToMain;
 
-    Voltages(float rating){
+    Voltages(float rating, float conversionRate){
         this.rating = rating;
+        this.conversionRateToMain = conversionRate;
     }
 
     public float getRating(){
         return rating;
+    }
+
+    public float getConversionRateToMain(){
+        return conversionRateToMain;
     }
 
     public int toInt(){
@@ -26,6 +32,14 @@ public enum Voltages{
 
     public static Voltages fromInt(int i){
         return Voltages.values()[i];
+    }
+
+    public float getConversionRateTo(Voltages other){
+        return getConversionRateBetween(this, other);
+    }
+
+    public static float getConversionRateBetween(Voltages first, Voltages second){
+        return first.getConversionRateToMain() - second.getConversionRateToMain();
     }
 
 }
