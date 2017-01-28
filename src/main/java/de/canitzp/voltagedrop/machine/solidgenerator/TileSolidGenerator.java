@@ -1,9 +1,9 @@
 package de.canitzp.voltagedrop.machine.solidgenerator;
 
 import de.canitzp.ctpcore.util.NBTSaveType;
+import de.canitzp.voltagedrop.Values;
 import de.canitzp.voltagedrop.capabilities.GeneratorEnergyDevice;
 import de.canitzp.voltagedrop.capabilities.SidedEnergyDevice;
-import de.canitzp.voltagedrop.capabilities.Voltages;
 import de.canitzp.voltagedrop.tile.TileEntityDevice;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
@@ -22,8 +22,6 @@ import java.util.List;
  */
 public class TileSolidGenerator extends TileEntityDevice<GeneratorEnergyDevice>{
 
-    public static final float CURRENT_TO_GEN = 0.01F;
-
     private int timeLeft;
 
     @Override
@@ -36,7 +34,7 @@ public class TileSolidGenerator extends TileEntityDevice<GeneratorEnergyDevice>{
                     ItemStack stack = item.getEntityItem();
                     if(TileEntityFurnace.isItemFuel(stack)){
                         if(checkForBurn(stack)){
-                            this.spawnParticle(EnumParticleTypes.CRIT_MAGIC, item.getPosition().getX(), item.getPosition().getY() + 0.5, item.getPosition().getZ(), 50, 0.25D, new int[0]);
+                            this.spawnParticle(EnumParticleTypes.TOTEM, item.getPosition().getX(), item.getPosition().getY() + 0.5, item.getPosition().getZ(), 50, 0.25D, new int[0]);
                         }
                     }
                 }
@@ -45,7 +43,7 @@ public class TileSolidGenerator extends TileEntityDevice<GeneratorEnergyDevice>{
                 timeLeft--;
                 GeneratorEnergyDevice device = this.getDeviceForSide(EnumFacing.NORTH);
                 if(device != null){
-                    device.generate(Voltages.MAINS, CURRENT_TO_GEN);
+                    device.generate(Values.SOLID_GENERATOR_VOLTAGE, Values.SOLID_GENERATOR_PRODUCE);
                 }
             }
             super.pushEnergy();
@@ -56,13 +54,13 @@ public class TileSolidGenerator extends TileEntityDevice<GeneratorEnergyDevice>{
 
     @Override
     protected SidedEnergyDevice<GeneratorEnergyDevice> getSidedEnergyDevice(World world, BlockPos pos){
-        return SidedEnergyDevice.createSingleEmpty(GeneratorEnergyDevice.class, Voltages.MAINS, 100);
+        return SidedEnergyDevice.createSingleEmpty(GeneratorEnergyDevice.class, Values.SOLID_GENERATOR_VOLTAGE, Values.SOLID_GENERATOR_CAPACITY);
     }
 
     private boolean checkForBurn(ItemStack stack){
         if(timeLeft <= 0){
             int burnTime = TileEntityFurnace.getItemBurnTime(stack);
-            if(this.sidedEnergyDevice.canStoreCurrent(burnTime * CURRENT_TO_GEN, EnumFacing.NORTH)){
+            if(this.sidedEnergyDevice.canStoreCurrent(burnTime * Values.PHOTOVOLTAIC_PRODUCE, EnumFacing.NORTH)){
                 stack.shrink(1);
                 this.timeLeft = burnTime;
                 return true;

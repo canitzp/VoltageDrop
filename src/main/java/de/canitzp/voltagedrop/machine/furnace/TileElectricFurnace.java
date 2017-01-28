@@ -3,10 +3,10 @@ package de.canitzp.voltagedrop.machine.furnace;
 import de.canitzp.ctpcore.util.NBTSaveType;
 import de.canitzp.ctpcore.util.NBTUtil;
 import de.canitzp.ctpcore.util.StackUtil;
+import de.canitzp.voltagedrop.Values;
 import de.canitzp.voltagedrop.api.recipe.RecipeElectricFurnace;
 import de.canitzp.voltagedrop.capabilities.SidedEnergyDevice;
 import de.canitzp.voltagedrop.capabilities.UserEnergyDevice;
-import de.canitzp.voltagedrop.capabilities.Voltages;
 import de.canitzp.voltagedrop.tile.TileEntityDevice;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.ItemStack;
@@ -25,8 +25,6 @@ import javax.annotation.Nullable;
  */
 public class TileElectricFurnace extends TileEntityDevice<UserEnergyDevice>{
 
-    public static final float ENERGY_USAGE = 0.005F;
-
     public InvWrapper inventory = new InvWrapper(new InventoryBasic("electric_furnace", false, 2));
 
     private int timeLeft, max;
@@ -34,7 +32,7 @@ public class TileElectricFurnace extends TileEntityDevice<UserEnergyDevice>{
 
     @Override
     protected SidedEnergyDevice<UserEnergyDevice> getSidedEnergyDevice(World world, BlockPos pos){
-        return SidedEnergyDevice.createSingleEmpty(UserEnergyDevice.class, Voltages.MAINS, 5);
+        return SidedEnergyDevice.createSingleEmpty(UserEnergyDevice.class, Values.ELECTRIC_FURNACE_VOLTAGE, Values.ELECTRIC_FURNACE_CAPACITY);
     }
 
     @Nullable
@@ -89,7 +87,7 @@ public class TileElectricFurnace extends TileEntityDevice<UserEnergyDevice>{
                 }
             } else if(timeLeft > 0){
                 timeLeft--;
-                this.getDeviceForSide(EnumFacing.NORTH).useEnergy(Voltages.MAINS, ENERGY_USAGE);
+                this.getDeviceForSide(EnumFacing.NORTH).useEnergy(Values.ELECTRIC_FURNACE_VOLTAGE, Values.ELECTRIC_FURNACE_CONSUMPTION);
             }
         }
     }
