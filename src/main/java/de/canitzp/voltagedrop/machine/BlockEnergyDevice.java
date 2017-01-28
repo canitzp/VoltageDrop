@@ -13,7 +13,9 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
@@ -28,6 +30,11 @@ public abstract class BlockEnergyDevice extends BlockContainerBase implements II
     public BlockEnergyDevice(Material material, String name, Class<? extends TileEntityBase> tileClass){
         super(material, new ResourceLocation(VoltageDrop.MODID, name), tileClass);
         this.setCreativeTab(VoltageDrop.tab);
+    }
+
+    @Override
+    public String getDescription(ItemStack stack, EntityPlayer player, boolean advanced){
+        return I18n.format("desc." + this.getRegisterName().toString());
     }
 
     @Override

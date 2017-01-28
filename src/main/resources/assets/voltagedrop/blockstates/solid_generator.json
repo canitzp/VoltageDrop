@@ -4,11 +4,11 @@
         "model": "minecraft:cube",
         "transform": "forge:default-block",
         "textures": {
-            "particle": "voltagedrop:blocks/machine_side",
-            "down": "voltagedrop:blocks/machine_topdown",
+            "particle": "voltagedrop:blocks/solid_generator_side_off",
+            "down": "voltagedrop:blocks/solid_generator_top_bottom",
             "up": "#down",
             "south": "#particle",
-            "north": "voltagedrop:blocks/solid_generator_front",
+            "north": "voltagedrop:blocks/solid_generator_front_off",
             "east": "#particle",
             "west": "#particle"
         }
@@ -29,6 +29,15 @@
             "down_south": {"x": 90, "y": 180},
             "down_west": {"x": 90, "y": 270},
             "down_east": {"x": 90, "y": 90}
+        },
+        "active": {
+            "false": {},
+            "true": {
+                "textures" : {
+                    "particle": "voltagedrop:blocks/solid_generator_side_on",
+                    "north": "voltagedrop:blocks/solid_generator_front_on"
+                }
+            }
         }
     }
 }

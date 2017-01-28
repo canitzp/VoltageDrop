@@ -49,6 +49,8 @@ public class TileSolidGenerator extends TileEntityDevice<GeneratorEnergyDevice>{
                 }
             }
             super.pushEnergy();
+        } else {
+            world.setBlockState(pos, world.getBlockState(pos).withProperty(BlockSolidGenerator.ACTIVE, timeLeft > 0));
         }
     }
 
