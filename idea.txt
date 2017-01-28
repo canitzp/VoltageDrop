@@ -1,0 +1,11 @@
+-Ilmenite ~late game
+    ->hot oven (1600°C)
+    ->needs magnesiumoxid
+-oxidation chamber
+-Dolomite ~early game
+    ->magnesium ore
+-sulfur ~early game
+    ->to craft batteries
+-Pentlandite
+    ->nickel ore
+    ->can provide iron and sulfur too
