@@ -1,6 +1,8 @@
 package de.canitzp.voltagedrop.machine.furnace;
 
+import de.canitzp.ctpcore.registry.IRegistryEntry;
 import de.canitzp.voltagedrop.VoltageDrop;
+import de.canitzp.voltagedrop.api.recipe.RecipeElectricFurnace;
 import de.canitzp.voltagedrop.machine.BlockEnergyDevice;
 import net.minecraft.block.material.Material;
 
@@ -19,4 +21,9 @@ public class BlockElectricFurnace extends BlockEnergyDevice{
         return true;
     }
 
+    @Override
+    public void onRegister(IRegistryEntry[] otherEntries){
+        super.onRegister(otherEntries);
+        RecipeElectricFurnace.processFurnaceRecipes();
+    }
 }

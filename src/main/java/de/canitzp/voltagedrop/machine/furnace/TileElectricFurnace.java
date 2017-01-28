@@ -25,17 +25,12 @@ import javax.annotation.Nullable;
  */
 public class TileElectricFurnace extends TileEntityDevice<UserEnergyDevice>{
 
-    public static final float ENERGY_USAGE = 0.1F;
+    public static final float ENERGY_USAGE = 0.005F;
 
     public InvWrapper inventory = new InvWrapper(new InventoryBasic("electric_furnace", false, 2));
 
     private int timeLeft, max;
     private ItemStack burnStack = ItemStack.EMPTY;
-
-    @Override
-    protected boolean autoSync(){
-        return true;
-    }
 
     @Override
     protected SidedEnergyDevice<UserEnergyDevice> getSidedEnergyDevice(World world, BlockPos pos){
@@ -94,8 +89,7 @@ public class TileElectricFurnace extends TileEntityDevice<UserEnergyDevice>{
                 }
             } else if(timeLeft > 0){
                 timeLeft--;
-                this.sidedEnergyDevice.getDeviceForSide(EnumFacing.NORTH).useEnergy(Voltages.MAINS, ENERGY_USAGE);
-                this.syncToClient();
+                this.getDeviceForSide(EnumFacing.NORTH).useEnergy(Voltages.MAINS, ENERGY_USAGE);
             }
         }
     }

@@ -27,11 +27,6 @@ public class TileBattery extends TileEntityDevice<EnergyDevice>{
     }
 
     @Override
-    protected boolean autoSync(){
-        return true;
-    }
-
-    @Override
     protected SidedEnergyDevice<EnergyDevice> getSidedEnergyDevice(World world, BlockPos pos){
         return SidedEnergyDevice.createSingleEmpty(EnergyDevice.class, this.voltage, this.savableCurrent);
     }

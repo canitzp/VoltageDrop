@@ -1,12 +1,12 @@
 package de.canitzp.voltagedrop.tile;
 
 import de.canitzp.ctpcore.base.TileEntityBase;
+import de.canitzp.ctpcore.sync.ISyncable;
 import de.canitzp.ctpcore.util.NBTSaveType;
 import de.canitzp.voltagedrop.capabilities.*;
 import de.canitzp.voltagedrop.machine.transformer.BlockTransformer;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
@@ -22,9 +22,8 @@ import javax.annotation.Nullable;
 /**
  * @author canitzp
  */
-public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEntityBase implements ITickable{
+public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEntityBase implements ITickable, ISyncable{
 
-    @Deprecated
     public SidedEnergyDevice<E> sidedEnergyDevice = new SidedEnergyDevice<E>().setUnstable();
     public int ticks;
 
@@ -61,7 +60,7 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
     public void readFromNBT(NBTTagCompound compound, NBTSaveType type){
         if(this.sidedEnergyDevice != null){
             if(type == NBTSaveType.SAVE || type == NBTSaveType.DROP_BLOCK){
-                this.sidedEnergyDevice.read(compound);
+                this.sidedEnergyDevice.read(compound, type == NBTSaveType.SAVE);
             } else {
                 this.sidedEnergyDevice.getSync(compound);
             }
@@ -73,9 +72,6 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
     public void update(){
         if(ticks == 0){
             setSidedEnergyIfNull();
-        }
-        if(!world.isRemote && autoSync() && world.getTotalWorldTime() % 10 == 0){
-            this.syncToClient();
         }
         ticks++;
     }
@@ -114,11 +110,14 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
         return from.canExtract() && to.canReceive() && from.extractEnergy(voltage, current, true).equals(ErrorTypes.OK) && to.receiveEnergy(voltage, current, true).equals(ErrorTypes.OK);
     }
 
-    protected abstract boolean autoSync();
+    @Override
+    public final boolean canSync(EntityPlayerMP player){
+        return false;
+    }
 
     @Override
-    public boolean canSync(EntityPlayerMP player){
-        return player.getTags().contains("Fully-Joined");
+    public final boolean canSync(){
+        return false;
     }
 
     public EnumFacing getFacings(){
@@ -127,10 +126,6 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
             return state.getValue(((BlockTransformer) state.getBlock()).getFacing()).getVanillaFacing();
         }
         return EnumFacing.NORTH;
-    }
-
-    public void onBlockChanged(@Nullable EntityPlayer player){
-        //TODO for wrench rotation
     }
 
     protected abstract SidedEnergyDevice<E> getSidedEnergyDevice(World world, BlockPos pos);
@@ -145,4 +140,20 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
         return this.sidedEnergyDevice != null && !this.sidedEnergyDevice.isUnstable() ? this.sidedEnergyDevice.getDeviceForSide(side) : null;
     }
 
+    @Override
+    public NBTTagCompound getSyncableData(){
+        NBTTagCompound nbt = new NBTTagCompound();
+        this.writeToNBT(nbt, NBTSaveType.SYNC);
+        return nbt;
+    }
+
+    @Override
+    public int getSyncTimeInTicks(){
+        return 10;
+    }
+
+    @Override
+    public void receiveData(NBTTagCompound data){
+        this.readFromNBT(data, NBTSaveType.SYNC);
+    }
 }

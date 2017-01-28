@@ -42,4 +42,8 @@ public enum Voltages{
         return first.getConversionRateToMain() - second.getConversionRateToMain();
     }
 
+    public String getLocalizated(){
+        return this.name();
+    }
+
 }

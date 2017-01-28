@@ -1,6 +1,5 @@
 package de.canitzp.voltagedrop.machine.solidgenerator;
 
-import de.canitzp.ctpcore.sync.ISyncable;
 import de.canitzp.ctpcore.util.NBTSaveType;
 import de.canitzp.voltagedrop.capabilities.GeneratorEnergyDevice;
 import de.canitzp.voltagedrop.capabilities.SidedEnergyDevice;
@@ -21,7 +20,7 @@ import java.util.List;
 /**
  * @author canitzp
  */
-public class TileSolidGenerator extends TileEntityDevice<GeneratorEnergyDevice> implements ISyncable{
+public class TileSolidGenerator extends TileEntityDevice<GeneratorEnergyDevice>{
 
     public static final float CURRENT_TO_GEN = 0.01F;
 
@@ -54,11 +53,6 @@ public class TileSolidGenerator extends TileEntityDevice<GeneratorEnergyDevice> 
     }
 
     @Override
-    protected boolean autoSync(){
-        return false;
-    }
-
-    @Override
     protected SidedEnergyDevice<GeneratorEnergyDevice> getSidedEnergyDevice(World world, BlockPos pos){
         return SidedEnergyDevice.createSingleEmpty(GeneratorEnergyDevice.class, Voltages.MAINS, 100);
     }
@@ -87,20 +81,4 @@ public class TileSolidGenerator extends TileEntityDevice<GeneratorEnergyDevice> 
         super.readFromNBT(compound, type);
     }
 
-    @Override
-    public NBTTagCompound getSyncableData(){
-        NBTTagCompound nbt = new NBTTagCompound();
-        this.writeToNBT(nbt, NBTSaveType.SYNC);
-        return nbt;
-    }
-
-    @Override
-    public int getSyncTimeInTicks(){
-        return 20;
-    }
-
-    @Override
-    public void receiveData(NBTTagCompound data){
-        this.readFromNBT(data, NBTSaveType.SYNC);
-    }
 }

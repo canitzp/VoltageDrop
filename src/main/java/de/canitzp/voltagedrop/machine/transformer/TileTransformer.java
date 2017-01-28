@@ -35,9 +35,4 @@ public abstract class TileTransformer extends TileEntityDevice<TransformerDevice
         return TransformerDevice.createTransformer(inputVoltage, outputVoltage, this.getFacings());
     }
 
-    @Override
-    protected boolean autoSync(){
-        return true;
-    }
-
 }

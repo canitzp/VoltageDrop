@@ -64,11 +64,16 @@ public class SidedEnergyDevice<T extends IEnergyDevice>{
         return nbt;
     }
 
-    public void read(NBTTagCompound nbt){
+    public void read(NBTTagCompound nbt, boolean forceNewClasses){
         for(EnumFacing side : EnumFacing.values()){
             if(nbt.hasKey(side.getName())){
                 try{
-                    T device = (T) Class.forName(nbt.getString(side.getName() + "Class")).newInstance();
+                    T device;
+                    if(forceNewClasses){
+                        device = (T) Class.forName(nbt.getString(side.getName() + "Class")).newInstance();
+                    } else {
+                        device = getDeviceForSide(side);
+                    }
                     if(device != null){
                         device.deserializeNBT((NBTTagCompound) nbt.getTag(side.getName()));
                     }
