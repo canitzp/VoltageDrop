@@ -12,15 +12,15 @@ public class TransformerDevice extends EnergyDevice{
 
     public TransformerDevice(){}
 
-    public TransformerDevice(Voltages voltages, boolean isInput){
-        super(voltages, 1);
+    public TransformerDevice(Voltages voltages, boolean isInput, float maxEnergy){
+        super(voltages, maxEnergy);
         this.isInput = isInput;
     }
 
     public static SidedEnergyDevice<TransformerDevice> createTransformer(Voltages input, Voltages output, EnumFacing inputSide){
         SidedEnergyDevice<TransformerDevice> device = new SidedEnergyDevice<>();
-        device.add(new TransformerDevice(input, true), inputSide);
-        device.add(new TransformerDevice(output, false), inputSide.getOpposite());
+        device.add(new TransformerDevice(input, true, 1), inputSide);
+        device.add(new TransformerDevice(output, false, output.getConversionRateTo(input)), inputSide.getOpposite());
         return device;
     }
 

@@ -1,6 +1,6 @@
 package de.canitzp.voltagedrop;
 
-import de.canitzp.ctpcore.inventory.CTPGuiHandler;
+import de.canitzp.ctpcore.CTPCore;
 import de.canitzp.voltagedrop.capabilities.Capabilities;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
@@ -36,7 +36,7 @@ public class VoltageDrop{
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event){
-        CTPGuiHandler.registerMod(this);
+        CTPCore.init(this, event);
     }
 
 }

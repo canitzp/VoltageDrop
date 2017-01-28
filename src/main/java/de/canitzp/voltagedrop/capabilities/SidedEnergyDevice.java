@@ -3,12 +3,15 @@ package de.canitzp.voltagedrop.capabilities;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 
+import java.util.Arrays;
+
 /**
  * @author canitzp
  */
 public class SidedEnergyDevice<T extends IEnergyDevice>{
 
     private T[] sidedDevices = (T[]) new IEnergyDevice[6];
+    private boolean unstable;
 
     public SidedEnergyDevice<T> add(T device, EnumFacing side){
         this.sidedDevices[side.ordinal()] = device;
@@ -26,7 +29,15 @@ public class SidedEnergyDevice<T extends IEnergyDevice>{
 
     public boolean canStoreCurrent(float current, EnumFacing side){
         T device = getDeviceForSide(side);
-        return device != null && device.getStored() + current <= device.getMaxStoreable();
+        return canStoreEnergy(current, device);
+    }
+
+    public static boolean canStoreEnergy(float toStore, IEnergyDevice device){
+        return device != null && device.getStored() + toStore <= device.getMaxStoreable();
+    }
+
+    public static float getStoreable(IEnergyDevice device){
+        return device.getMaxStoreable() - device.getStored();
     }
 
     public static <T extends IEnergyDevice> SidedEnergyDevice<T> createSingleEmpty(Class<T> deviceClass, Voltages voltage, float maxSavableCurrent){
@@ -57,10 +68,11 @@ public class SidedEnergyDevice<T extends IEnergyDevice>{
         for(EnumFacing side : EnumFacing.values()){
             if(nbt.hasKey(side.getName())){
                 try{
-                    T device = getDeviceForSide(side);
+                    T device = (T) Class.forName(nbt.getString(side.getName() + "Class")).newInstance();
                     if(device != null){
                         device.deserializeNBT((NBTTagCompound) nbt.getTag(side.getName()));
                     }
+                    this.add(device, side);
                 } catch(Exception e){
                     e.printStackTrace();
                 }
@@ -89,4 +101,27 @@ public class SidedEnergyDevice<T extends IEnergyDevice>{
         }
     }
 
+    public SidedEnergyDevice<T> merge(SidedEnergyDevice<T> device){
+        for(int i = 0; i < device.sidedDevices.length; i++){
+            T device1 = device.sidedDevices[i];
+            if(device1 != null){
+                this.sidedDevices[i].deserializeNBT(device1.serializeNBT());
+            }
+        }
+        return this;
+    }
+
+    public SidedEnergyDevice<T> setUnstable(){
+        this.unstable = true;
+        return this;
+    }
+
+    public boolean isUnstable(){
+        return this.unstable;
+    }
+
+    @Override
+    public String toString(){
+        return "SidedEnergyDevice{unstable = " + unstable + ", " + Arrays.toString(this.sidedDevices) + "}";
+    }
 }

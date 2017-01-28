@@ -4,8 +4,11 @@ import de.canitzp.ctpcore.base.TileEntityBase;
 import de.canitzp.ctpcore.util.NBTSaveType;
 import de.canitzp.voltagedrop.capabilities.*;
 import de.canitzp.voltagedrop.machine.transformer.BlockTransformer;
+import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -15,8 +18,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author canitzp
@@ -24,8 +25,7 @@ import java.util.Map;
 public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEntityBase implements ITickable{
 
     @Deprecated
-    public SidedEnergyDevice<E> sidedEnergyDevice;
-    protected Map<BlockPos, EnumFacing> energyPos = new HashMap<>();
+    public SidedEnergyDevice<E> sidedEnergyDevice = new SidedEnergyDevice<E>().setUnstable();
     public int ticks;
 
     @Override
@@ -73,23 +73,11 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
     public void update(){
         if(ticks == 0){
             setSidedEnergyIfNull();
-            this.onBlockUpdate();
         }
-        if(!world.isRemote && autoSync() && world.getTotalWorldTime() % 40 == 0){
+        if(!world.isRemote && autoSync() && world.getTotalWorldTime() % 10 == 0){
             this.syncToClient();
         }
         ticks++;
-    }
-
-    public void onBlockUpdate(){
-        this.energyPos.clear();
-        for(EnumFacing side : EnumFacing.values()){
-            BlockPos pos = this.pos.offset(side);
-            TileEntity tile = this.world.getTileEntity(pos);
-            if(tile != null && tile.hasCapability(Capabilities.ENERGY, side.getOpposite())){
-                this.energyPos.put(pos, side.getOpposite());
-            }
-        }
     }
 
     public void onBlockPlaced(){
@@ -98,16 +86,24 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
 
     protected void pushEnergy(){
         if(!world.isRemote){
-            for(Map.Entry<BlockPos, EnumFacing> entry : energyPos.entrySet()){
-                IEnergyDevice device = world.getTileEntity(entry.getKey()).getCapability(Capabilities.ENERGY, entry.getValue());
-                if(device != null){
-                    IEnergyDevice thisDev = this.getDeviceForSide(entry.getValue().getOpposite());
-                    Voltages voltage = thisDev.getVoltage();
-                    float current = Math.min(thisDev.getStored(), device.getMaxFlow());
-                    if(canDevicesTransfer(thisDev, device, voltage, current)){
-                        device.receiveEnergy(voltage, thisDev.extractEnergy(voltage, current, false).energy, false);
-                        ((TileEntityDevice) world.getTileEntity(entry.getKey())).syncToClient();
-                        this.syncToClient();
+            for(EnumFacing side : EnumFacing.values()){
+                BlockPos pos = this.pos.offset(side);
+                IBlockState state = world.getBlockState(pos);
+                if(!(state.getBlock() == Blocks.AIR.getDefaultState()) && state.getBlock() instanceof ITileEntityProvider){
+                    TileEntity tile = world.getTileEntity(pos);
+                    if(tile != null && tile.hasCapability(Capabilities.ENERGY, side.getOpposite())){
+                        IEnergyDevice device = tile.getCapability(Capabilities.ENERGY, side.getOpposite());
+                        if(device != null){
+                            IEnergyDevice thisDev = this.getDeviceForSide(side.getOpposite());
+                            Voltages voltage = thisDev.getVoltage();
+                            float current = Math.min(thisDev.getStored(), Math.min(device.getMaxFlow(), thisDev.getMaxFlow()));
+                            if(!SidedEnergyDevice.canStoreEnergy(current, device)){
+                                current = SidedEnergyDevice.getStoreable(device);
+                            }
+                            if(current > 0 && canDevicesTransfer(thisDev, device, voltage, current)){
+                                device.receiveEnergy(voltage, thisDev.extractEnergy(voltage, current, false).energy, false);
+                            }
+                        }
                     }
                 }
             }
@@ -121,8 +117,8 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
     protected abstract boolean autoSync();
 
     @Override
-    public boolean canSync(){
-        return this.ticks >= 100;
+    public boolean canSync(EntityPlayerMP player){
+        return player.getTags().contains("Fully-Joined");
     }
 
     public EnumFacing getFacings(){
@@ -140,14 +136,13 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
     protected abstract SidedEnergyDevice<E> getSidedEnergyDevice(World world, BlockPos pos);
 
     protected void setSidedEnergyIfNull(){
-        if(this.sidedEnergyDevice == null){
-            this.sidedEnergyDevice = getSidedEnergyDevice(this.world, this.pos);
+        if(this.sidedEnergyDevice.isUnstable()){
+            this.sidedEnergyDevice = getSidedEnergyDevice(this.world, this.pos).merge(this.sidedEnergyDevice);
         }
     }
 
     public E getDeviceForSide(EnumFacing side){
-        return this.sidedEnergyDevice != null ? this.sidedEnergyDevice.getDeviceForSide(side) : null;
-
+        return this.sidedEnergyDevice != null && !this.sidedEnergyDevice.isUnstable() ? this.sidedEnergyDevice.getDeviceForSide(side) : null;
     }
 
 }
