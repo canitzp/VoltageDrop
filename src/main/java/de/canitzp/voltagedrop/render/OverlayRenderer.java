@@ -3,8 +3,6 @@ package de.canitzp.voltagedrop.render;
 import de.canitzp.voltagedrop.tile.TileEntityDevice;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -22,7 +20,7 @@ public class OverlayRenderer{
 
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
-    public static void onGameRender(RenderGameOverlayEvent.Post event){
+    public static void onGameRender(RenderGameOverlayEvent.Text event){
         Minecraft minecraft = Minecraft.getMinecraft();
         if(minecraft.currentScreen == null){
             if(minecraft.objectMouseOver.typeOfHit.equals(RayTraceResult.Type.BLOCK)){

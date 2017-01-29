@@ -1,30 +1,38 @@
 package de.canitzp.voltagedrop.tile;
 
+import de.canitzp.ctpcore.base.ItemBase;
 import de.canitzp.ctpcore.base.TileEntityBase;
 import de.canitzp.ctpcore.sync.ISyncable;
 import de.canitzp.ctpcore.util.NBTSaveType;
 import de.canitzp.voltagedrop.capabilities.*;
 import de.canitzp.voltagedrop.machine.transformer.BlockTransformer;
+import de.canitzp.voltagedrop.machine.upgrade.IUpgrade;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author canitzp
  */
-public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEntityBase implements ITickable, ISyncable{
+public abstract class TileEntityDevice<K extends IEnergyDevice> extends TileEntityBase implements ITickable, ISyncable{
 
-    public SidedEnergyDevice<E> sidedEnergyDevice = new SidedEnergyDevice<E>().setUnstable();
+    private List<IUpgrade> installedUpgrades = new ArrayList<>();
+    public SidedEnergyDevice<K> sidedEnergyDevice = new SidedEnergyDevice<K>().setUnstable();
     public int ticks;
 
     @Override
@@ -53,6 +61,16 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
                 compound = this.sidedEnergyDevice.sync(compound);
             }
         }
+        if(!installedUpgrades.isEmpty()){
+            NBTTagCompound upgrades = new NBTTagCompound();
+            for(IUpgrade upgrade : installedUpgrades){
+                NBTTagCompound nbt = (NBTTagCompound) upgrade.serializeNBT();
+                upgrades.setTag(upgrade.getName(), nbt);
+                upgrades.setString(upgrade.getName() + "Class", upgrade.getClass().getName());
+                upgrades.setString(upgrade.getName() + "Item", upgrade.getItem().getRegisterName().toString());
+            }
+            compound.setTag("InstalledUpgrades", upgrades);
+        }
         super.writeToNBT(compound, type);
     }
 
@@ -63,6 +81,25 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
                 this.sidedEnergyDevice.read(compound, type == NBTSaveType.SAVE);
             } else {
                 this.sidedEnergyDevice.getSync(compound);
+            }
+        }
+        if(compound.hasKey("InstalledUpgrades")){
+            if(type == NBTSaveType.SYNC){
+                this.installedUpgrades.clear();
+            }
+            NBTTagCompound upgrades = compound.getCompoundTag("InstalledUpgrades");
+            for(String key : upgrades.getKeySet()){
+                if(key.endsWith("Class")){
+                    try{
+                        Class<IUpgrade> c = (Class<IUpgrade>) Class.forName(upgrades.getString(key));
+                        Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(upgrades.getString(key.substring(0, key.length()-5) + "Item")));
+                        IUpgrade upgrade = c.getConstructor(ItemBase.class).newInstance((ItemBase)item);
+                        upgrade.deserializeNBT(upgrades.getCompoundTag(key.substring(0, key.length()-6)));
+                        installedUpgrades.add(upgrade);
+                    } catch(Exception e){
+                        e.printStackTrace();
+                    }
+                }
             }
         }
         super.readFromNBT(compound, type);
@@ -128,7 +165,7 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
         return EnumFacing.NORTH;
     }
 
-    protected abstract SidedEnergyDevice<E> getSidedEnergyDevice(World world, BlockPos pos);
+    protected abstract SidedEnergyDevice<K> getSidedEnergyDevice(World world, BlockPos pos);
 
     protected void setSidedEnergyIfNull(){
         if(this.sidedEnergyDevice.isUnstable()){
@@ -136,7 +173,7 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
         }
     }
 
-    public E getDeviceForSide(EnumFacing side){
+    public K getDeviceForSide(EnumFacing side){
         return this.sidedEnergyDevice != null && !this.sidedEnergyDevice.isUnstable() ? this.sidedEnergyDevice.getDeviceForSide(side) : null;
     }
 
@@ -155,5 +192,19 @@ public abstract class TileEntityDevice<E extends IEnergyDevice> extends TileEnti
     @Override
     public void receiveData(NBTTagCompound data){
         this.readFromNBT(data, NBTSaveType.SYNC);
+    }
+
+    public boolean installUpgrade(IUpgrade upgrade){
+        for(IUpgrade installed : installedUpgrades){
+            if(installed.getName().equals(upgrade.getName())){
+                return false;
+            }
+        }
+        installedUpgrades.add(upgrade);
+        return true;
+    }
+
+    public List<IUpgrade> getInstalledUpgrades(){
+        return installedUpgrades;
     }
 }

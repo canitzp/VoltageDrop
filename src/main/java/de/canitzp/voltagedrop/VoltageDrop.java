@@ -2,8 +2,11 @@ package de.canitzp.voltagedrop;
 
 import de.canitzp.ctpcore.CTPCore;
 import de.canitzp.voltagedrop.capabilities.Capabilities;
+import de.canitzp.voltagedrop.machine.furnace.TileElectricFurnace;
+import de.canitzp.voltagedrop.render.TileUpgradeRenderer;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -32,6 +35,9 @@ public class VoltageDrop{
     public void preInit(FMLPreInitializationEvent event){
         Registry.preInit();
         Capabilities.init();
+        if(event.getSide().isClient()){
+            ClientRegistry.bindTileEntitySpecialRenderer(TileElectricFurnace.class, new TileUpgradeRenderer<>());
+        }
     }
 
     @Mod.EventHandler
