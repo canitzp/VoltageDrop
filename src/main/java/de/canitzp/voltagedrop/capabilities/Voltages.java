@@ -9,7 +9,8 @@ public enum Voltages{
     LOW(5, 6.45F),
     FAST_CHARGE(9, 6.25F),
     LAPTOP_CHARGE(19, 6),
-    MAINS(230, 0);
+    MAINS(230, 0),
+    THREE_PHASE(400, 0.33F);
 
     private float rating, conversionRateToMain;
 

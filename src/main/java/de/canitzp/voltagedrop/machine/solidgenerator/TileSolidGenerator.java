@@ -11,7 +11,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -29,7 +28,7 @@ public class TileSolidGenerator extends TileEntityDevice<GeneratorEnergyDevice>{
         super.update();
         if(!world.isRemote){
             if(world.getTotalWorldTime() % 20 == 0 && timeLeft <= 0){
-                List<EntityItem> items = world.getEntitiesWithinAABB(EntityItem.class, new AxisAlignedBB(this.pos.getX() - 3, this.pos.getY() - 3, this.pos.getZ() - 3, this.pos.getX() + 3, this.pos.getY() + 3, this.pos.getZ() + 3));
+                List<EntityItem> items = world.getEntitiesWithinAABB(EntityItem.class, getInside(0.55F));
                 for(EntityItem item : items){
                     ItemStack stack = item.getEntityItem();
                     if(TileEntityFurnace.isItemFuel(stack)){
@@ -60,7 +59,7 @@ public class TileSolidGenerator extends TileEntityDevice<GeneratorEnergyDevice>{
     private boolean checkForBurn(ItemStack stack){
         if(timeLeft <= 0){
             int burnTime = TileEntityFurnace.getItemBurnTime(stack);
-            if(this.sidedEnergyDevice.canStoreCurrent(burnTime * Values.PHOTOVOLTAIC_PRODUCE, EnumFacing.NORTH)){
+            if(this.sidedEnergyDevice.canStoreCurrent(burnTime * Values.SOLID_GENERATOR_PRODUCE, EnumFacing.NORTH)){
                 stack.shrink(1);
                 this.timeLeft = burnTime;
                 return true;

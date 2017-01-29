@@ -6,6 +6,6 @@
     ->magnesium ore
 -sulfur ~early game
     ->to craft batteries
--Pentlandite
+-Pentlandite ~early game
     ->nickel ore
     ->can provide iron and sulfur too

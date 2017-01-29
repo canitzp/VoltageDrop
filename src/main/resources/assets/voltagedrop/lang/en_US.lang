@@ -6,9 +6,11 @@ tile.voltagedrop:solid_generator.name=Solid Generator
 tile.voltagedrop:battery_mains.name=Battery Main Voltage
 tile.voltagedrop:electric_furnace.name=Electric Furnace
 tile.voltagedrop:transformer_basic.name=Transformer 230V to 5V
+tile.voltagedrop:arc_oven.name=Arc Oven
 
 // Desc
 desc.voltagedrop:battery_mains=This battery does store up to 750Ah at 230V.
 desc.voltagedrop:solid_generator=Drop some burnable items in front of it, to produce energy.
 desc.voltagedrop:electric_furnace=It's a furnace, but it works with energy.
 desc.voltagedrop:transformer_basic=Can transform 230V to 5V
+desc.voltagedrop:arc_oven=This oven needs a hot liquid under it.
