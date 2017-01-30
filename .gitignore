@@ -6,3 +6,8 @@
 /Voltage Drop.iws
 /out/
 /.gradle/
+/.idea
+*.iws
+*.ipr
+*.iml
+/classes
