@@ -1,8 +1,9 @@
 package de.canitzp.voltagedrop.machine.arcoven;
 
+import de.canitzp.ctpcore.recipe.RecipeRegistry;
 import de.canitzp.ctpcore.util.NBTSaveType;
 import de.canitzp.ctpcore.util.NBTUtil;
-import de.canitzp.voltagedrop.api.recipe.RecipeArcOven;
+import de.canitzp.voltagedrop.api.recipe.Recipes;
 import de.canitzp.voltagedrop.capabilities.SidedEnergyDevice;
 import de.canitzp.voltagedrop.capabilities.UserEnergyDevice;
 import de.canitzp.voltagedrop.capabilities.Voltages;
@@ -38,10 +39,9 @@ public class TileArcOven extends TileEntityDevice<UserEnergyDevice>{
             if(world.getTotalWorldTime() % 20 == 0 && timeLeft <= 0){
                 if(outputStack.isEmpty()){
                     List<EntityItem> items = this.world.getEntitiesWithinAABB(EntityItem.class, getInside(0.55F));
-                    System.out.println(items);
                     for(EntityItem item : items){
                         ItemStack stack = item.getEntityItem();
-                        if(RecipeArcOven.getRecipe(stack) != null){
+                        if(RecipeRegistry.hasRecipeFor(Recipes.ARC_OVEN.getCategory(), stack)){
                             if(checkForBurn(stack)){
                                 this.spawnParticle(EnumParticleTypes.FLAME, item.getPosition().getX(), item.getPosition().getY() + 0.5, item.getPosition().getZ(), 50, 0.25D, new int[0]);
                             }
@@ -55,7 +55,7 @@ public class TileArcOven extends TileEntityDevice<UserEnergyDevice>{
             if(timeLeft > 0){
                 if(this.getDeviceForSide(EnumFacing.NORTH).getStored() >= 0.01F){
                     timeLeft--;
-                    this.getDeviceForSide(EnumFacing.NORTH).extractEnergy(Voltages.THREE_PHASE, 0.01F, false);
+                    this.getDeviceForSide(EnumFacing.NORTH).extractEnergy(Voltages.MAINS, 0.01F, false);
                 }
             }
         }
@@ -65,11 +65,11 @@ public class TileArcOven extends TileEntityDevice<UserEnergyDevice>{
         if(!(world.getBlockState(pos.offset(EnumFacing.DOWN)).getBlock() == Blocks.LAVA)){
            return false;
         }
-        RecipeArcOven.RecipePattern recipe = RecipeArcOven.getRecipe(stack);
+        Recipes.ArcOven recipe = (Recipes.ArcOven) RecipeRegistry.getRecipeFor(Recipes.ARC_OVEN.getCategory(), stack);
         if(recipe != null){
-            this.outputStack = recipe.out.copy();
+            this.outputStack = recipe.getOutput().copy();
             stack.shrink(1);
-            this.timeLeft = recipe.burnTime;
+            this.timeLeft = recipe.getBurnTime();
             return true;
         }
         return false;

@@ -2,7 +2,7 @@ package de.canitzp.voltagedrop;
 
 import de.canitzp.ctpcore.base.ItemBase;
 import de.canitzp.ctpcore.registry.MCRegistry;
-import de.canitzp.voltagedrop.api.recipe.RecipeArcOven;
+import de.canitzp.voltagedrop.api.recipe.Recipes;
 import de.canitzp.voltagedrop.block.BlockWeightedOre;
 import de.canitzp.voltagedrop.machine.arcoven.BlockArcOven;
 import de.canitzp.voltagedrop.machine.battery.batterymains.BlockBatteryMains;
@@ -66,7 +66,7 @@ public class Registry{
             }
         });
 
-        RecipeArcOven.addRecipe(new RecipeArcOven.RecipePattern(new ItemStack(Items.APPLE), new ItemStack(Blocks.LEAVES)));
+        MCRegistry.register(new Recipes.ArcOven(new ItemStack(Items.APPLE), new ItemStack(Blocks.LEAVES)));
     }
 
 }

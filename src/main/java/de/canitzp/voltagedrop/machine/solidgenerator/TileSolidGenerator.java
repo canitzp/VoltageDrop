@@ -28,7 +28,7 @@ public class TileSolidGenerator extends TileEntityDevice<GeneratorEnergyDevice>{
         super.update();
         if(!world.isRemote){
             if(world.getTotalWorldTime() % 20 == 0 && timeLeft <= 0){
-                List<EntityItem> items = world.getEntitiesWithinAABB(EntityItem.class, getInside(0.55F));
+                List<EntityItem> items = world.getEntitiesWithinAABB(EntityItem.class, getInside(1F));
                 for(EntityItem item : items){
                     ItemStack stack = item.getEntityItem();
                     if(TileEntityFurnace.isItemFuel(stack)){

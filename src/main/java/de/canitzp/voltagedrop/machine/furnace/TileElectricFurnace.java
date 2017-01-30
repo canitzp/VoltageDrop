@@ -1,17 +1,21 @@
 package de.canitzp.voltagedrop.machine.furnace;
 
+import de.canitzp.ctpcore.recipe.RecipeRegistry;
 import de.canitzp.ctpcore.util.NBTSaveType;
 import de.canitzp.ctpcore.util.NBTUtil;
-import de.canitzp.ctpcore.util.StackUtil;
 import de.canitzp.voltagedrop.Values;
-import de.canitzp.voltagedrop.api.recipe.RecipeElectricFurnace;
+import de.canitzp.voltagedrop.api.recipe.Recipes;
 import de.canitzp.voltagedrop.capabilities.SidedEnergyDevice;
 import de.canitzp.voltagedrop.capabilities.UserEnergyDevice;
+import de.canitzp.voltagedrop.capabilities.Voltages;
+import de.canitzp.voltagedrop.machine.solidgenerator.BlockSolidGenerator;
 import de.canitzp.voltagedrop.tile.TileEntityDevice;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
@@ -19,6 +23,8 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
 import javax.annotation.Nullable;
+import java.util.List;
+
 
 /**
  * @author canitzp
@@ -28,7 +34,7 @@ public class TileElectricFurnace extends TileEntityDevice<UserEnergyDevice>{
     public InvWrapper inventory = new InvWrapper(new InventoryBasic("electric_furnace", false, 2));
 
     private int timeLeft, max;
-    private ItemStack burnStack = ItemStack.EMPTY;
+    private ItemStack outputStack = ItemStack.EMPTY;
 
     @Override
     protected SidedEnergyDevice<UserEnergyDevice> getSidedEnergyDevice(World world, BlockPos pos){
@@ -49,7 +55,7 @@ public class TileElectricFurnace extends TileEntityDevice<UserEnergyDevice>{
         super.writeToNBT(compound, type);
         compound.setInteger("TimeLeft", this.timeLeft);
         compound.setInteger("TimeMax", this.max);
-        NBTUtil.setItemStack(compound, "BurnStack", this.burnStack);
+        NBTUtil.setItemStack(compound, "OutStack", this.outputStack);
     }
 
     @Override
@@ -57,56 +63,49 @@ public class TileElectricFurnace extends TileEntityDevice<UserEnergyDevice>{
         super.readFromNBT(compound, type);
         this.timeLeft = compound.getInteger("TimeLeft");
         this.max = compound.getInteger("TimeMax");
-        this.burnStack = NBTUtil.getItemStack(compound, "BurnStack");
+        this.outputStack = NBTUtil.getItemStack(compound, "OutStack");
     }
 
     @Override
     public void update(){
         super.update();
         if(!world.isRemote){
-            ItemStack input = getInputSlot();
-            if(timeLeft <= 0){
-                if(this.burnStack.isEmpty()){
-                    if(!input.isEmpty() && checkOutputSlot(input)){
-                        RecipeElectricFurnace.RecipePattern recipe = RecipeElectricFurnace.getRecipe(input);
-                        if(recipe != null){
-                            getInputSlot().shrink(recipe.in.getCount());
-                            this.timeLeft = this.max = recipe.burnTime;
-                            this.burnStack = recipe.in;
+            if(world.getTotalWorldTime() % 20 == 0 && timeLeft <= 0){
+                if(outputStack.isEmpty()){
+                    List<EntityItem> items = world.getEntitiesWithinAABB(EntityItem.class, getInside(0.55F));
+                    for(EntityItem item : items){
+                        ItemStack stack = item.getEntityItem();
+                        if(RecipeRegistry.hasRecipeFor(Recipes.ELECTRIC_FURNACE.getCategory(), stack)){
+                            if(checkForBurn(stack)){
+                                this.spawnParticle(EnumParticleTypes.TOTEM, item.getPosition().getX(), item.getPosition().getY() + 0.5, item.getPosition().getZ(), 50, 0.25D, new int[0]);
+                            }
                         }
                     }
                 } else {
-                    RecipeElectricFurnace.RecipePattern recipe = RecipeElectricFurnace.getRecipe(this.burnStack);
-                    if(getOutputSlot().isEmpty()){
-                        setOutputSlot(recipe.out.copy());
-                    } else {
-                        getOutputSlot().grow(recipe.out.getCount());
-                    }
-                    this.burnStack = ItemStack.EMPTY;
-                    this.max = 0;
+                    this.world.spawnEntity(new EntityItem(world, pos.getX(), pos.getY() + 1D, pos.getZ(), this.outputStack.copy()));
+                    this.outputStack = ItemStack.EMPTY;
                 }
-            } else if(timeLeft > 0){
-                timeLeft--;
-                this.getDeviceForSide(EnumFacing.NORTH).useEnergy(Values.ELECTRIC_FURNACE_VOLTAGE, Values.ELECTRIC_FURNACE_CONSUMPTION);
             }
+            if(timeLeft > 0){
+                if(this.getDeviceForSide(EnumFacing.NORTH).getStored() >= Values.ELECTRIC_FURNACE_CONSUMPTION){
+                    timeLeft--;
+                    this.getDeviceForSide(EnumFacing.NORTH).useEnergy(Voltages.MAINS, Values.ELECTRIC_FURNACE_CONSUMPTION);
+                }
+            }
+        } else {
+            world.setBlockState(pos, world.getBlockState(pos).withProperty(BlockSolidGenerator.ACTIVE, timeLeft> 0 && (this.getDeviceForSide(EnumFacing.NORTH).getStored() >= Values.ELECTRIC_FURNACE_CONSUMPTION)));
         }
     }
 
-    public ItemStack getInputSlot(){
-        return this.inventory.getStackInSlot(0);
-    }
-
-    public ItemStack getOutputSlot(){
-        return this.inventory.getStackInSlot(1);
-    }
-
-    public void setOutputSlot(ItemStack stack){
-        this.inventory.setStackInSlot(1, stack);
-    }
-
-    public boolean checkOutputSlot(ItemStack stack){
-        RecipeElectricFurnace.RecipePattern recipe = RecipeElectricFurnace.getRecipe(stack);
-        return getOutputSlot().isEmpty() || (recipe != null && StackUtil.canMerge(recipe.out, getOutputSlot()));
+    private boolean checkForBurn(ItemStack stack){
+        Recipes.ElectricFurnace recipe = (Recipes.ElectricFurnace) RecipeRegistry.getRecipeFor(Recipes.ELECTRIC_FURNACE.getCategory(), stack);
+        if(recipe != null){
+            this.outputStack = recipe.getOutput().copy();
+            stack.shrink(1);
+            this.timeLeft = recipe.getBurnTime();
+            return true;
+        }
+        return false;
     }
 
     public int getTimeLeft(){
