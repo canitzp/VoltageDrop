@@ -14,3 +14,13 @@ desc.voltagedrop:solid_generator=Drop some burnable items in front of it, to pro
 desc.voltagedrop:electric_furnace=It's a furnace, but it works with energy.
 desc.voltagedrop:transformer_basic=Can transform 230V to 5V
 desc.voltagedrop:arc_oven=This oven needs a hot liquid under it.
+
+//Resources:
+ore.voltagedrop:dolomite=Dolomite
+ore.voltagedrop:ilmenite=Ilmenite
+ore.voltagedrop:pentlandite=Pentlandite
+ore.voltagedrop:sulfur=Sulfur
+
+//Prefixes & Suffixes
+prefix.voltagedrop:ore=Ore
+prefix.voltagedrop:ingot=Ingot

@@ -7,7 +7,6 @@ import de.canitzp.voltagedrop.machine.BlockEnergyDevice;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 
@@ -23,11 +22,6 @@ public class BlockElectricFurnace extends BlockEnergyDevice{
     public BlockElectricFurnace(){
         super(Material.ROCK, "electric_furnace", TileElectricFurnace.class);
         this.setDefaultState(this.blockState.getBaseState().withProperty(ACTIVE, false));
-    }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state){
-        return false;
     }
 
     @Override

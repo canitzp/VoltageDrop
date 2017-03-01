@@ -1,7 +1,11 @@
 package de.canitzp.voltagedrop.block;
 
 import de.canitzp.ctpcore.base.BlockBase;
+import de.canitzp.ctpcore.base.ItemBlockBase;
+import de.canitzp.ctpcore.registry.IRegistryEntry;
+import de.canitzp.ctpcore.registry.SmeltingRecipeProvider;
 import de.canitzp.voltagedrop.VoltageDrop;
+import de.canitzp.voltagedrop.item.ItemIngot;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
@@ -15,6 +19,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -27,11 +32,18 @@ import java.util.List;
 public class BlockWeightedOre extends BlockBase<BlockWeightedOre>{
 
     public static final PropertyEnum<Weight> WEIGHT = PropertyEnum.create("weight", Weight.class);
+    private static final String PREFIX = I18n.translateToLocal("prefix.voltagedrop:ore");
 
-    public BlockWeightedOre(String name){
+    private ItemIngot ingot;
+    private ItemBlockBase itemBlock = new ItemBlockBase(this);
+    private String name;
+
+    public BlockWeightedOre(String name, int ingotColor){
         super(Material.ROCK, new ResourceLocation(VoltageDrop.MODID, "ore_".concat(name)));
         this.setCreativeTab(VoltageDrop.tab);
         this.setDefaultState(this.blockState.getBaseState().withProperty(WEIGHT, Weight.MEDIUM));
+        this.ingot = new ItemIngot(name, ingotColor);
+        this.name = name;
     }
 
     @Override
@@ -89,6 +101,25 @@ public class BlockWeightedOre extends BlockBase<BlockWeightedOre>{
     @Override
     public int getMetaFromState(IBlockState state){
         return state.getValue(WEIGHT).ordinal();
+    }
+
+    @Override
+    public String getLocalizedName(){
+        return PREFIX + " " + I18n.translateToLocal("ore.voltagedrop:" + this.name);
+    }
+
+    @Override
+    public IRegistryEntry[] getRegisterElements(){
+        return new IRegistryEntry[]{this, itemBlock, this.ingot, new SmeltingRecipeProvider(new ItemStack(itemBlock), new ItemStack(this.ingot))};
+    }
+
+    public ItemIngot getIngot(){
+        return ingot;
+    }
+
+    public BlockWeightedOre customIngot(ItemIngot item){
+        this.ingot = item;
+        return this;
     }
 
     public enum Weight implements IStringSerializable{

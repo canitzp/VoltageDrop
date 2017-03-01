@@ -1,6 +1,5 @@
 package de.canitzp.voltagedrop.tile;
 
-import de.canitzp.ctpcore.base.ItemBase;
 import de.canitzp.ctpcore.base.TileEntityBase;
 import de.canitzp.ctpcore.sync.ISyncable;
 import de.canitzp.ctpcore.util.NBTSaveType;
@@ -12,6 +11,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -67,7 +67,7 @@ public abstract class TileEntityDevice<K extends IEnergyDevice> extends TileEnti
                 NBTTagCompound nbt = (NBTTagCompound) upgrade.serializeNBT();
                 upgrades.setTag(upgrade.getName(), nbt);
                 upgrades.setString(upgrade.getName() + "Class", upgrade.getClass().getName());
-                upgrades.setString(upgrade.getName() + "Item", upgrade.getItem().getRegisterName().toString());
+                upgrades.setString(upgrade.getName() + "Item", upgrade.getRenderStack(this).getItem().getRegistryName().toString());
             }
             compound.setTag("InstalledUpgrades", upgrades);
         }
@@ -93,7 +93,7 @@ public abstract class TileEntityDevice<K extends IEnergyDevice> extends TileEnti
                     try{
                         Class<IUpgrade> c = (Class<IUpgrade>) Class.forName(upgrades.getString(key));
                         Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(upgrades.getString(key.substring(0, key.length()-5) + "Item")));
-                        IUpgrade upgrade = c.getConstructor(ItemBase.class).newInstance((ItemBase)item);
+                        IUpgrade upgrade = c.getConstructor(ItemStack.class).newInstance(new ItemStack(item));
                         upgrade.deserializeNBT(upgrades.getCompoundTag(key.substring(0, key.length()-6)));
                         installedUpgrades.add(upgrade);
                     } catch(Exception e){

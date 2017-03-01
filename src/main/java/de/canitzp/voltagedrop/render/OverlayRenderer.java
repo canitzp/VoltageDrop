@@ -1,5 +1,6 @@
 package de.canitzp.voltagedrop.render;
 
+import de.canitzp.voltagedrop.VoltageDrop;
 import de.canitzp.voltagedrop.tile.TileEntityDevice;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -15,7 +16,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 /**
  * @author canitzp
  */
-@Mod.EventBusSubscriber
+@Mod.EventBusSubscriber(value = {Side.CLIENT}, modid = VoltageDrop.MODID)
 public class OverlayRenderer{
 
     @SideOnly(Side.CLIENT)

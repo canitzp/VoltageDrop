@@ -1,7 +1,7 @@
 package de.canitzp.voltagedrop.machine.upgrade;
 
-import de.canitzp.ctpcore.base.ItemBase;
 import de.canitzp.voltagedrop.tile.TileEntityDevice;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -29,7 +29,7 @@ public interface IUpgrade<E extends IUpgrade> extends INBTSerializable<NBTTagCom
 
     String getName();
 
-    ItemBase getItem();
+    ItemStack getRenderStack(TileEntityDevice tile);
 
     @SideOnly(Side.CLIENT)
     default void renderSpecial(TileEntityDevice tile, double x, double y, double z){}

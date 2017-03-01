@@ -33,6 +33,11 @@ public abstract class BlockEnergyDevice extends BlockContainerBase implements II
     }
 
     @Override
+    public boolean isOpaqueCube(IBlockState state){
+        return false;
+    }
+
+    @Override
     public String getDescription(ItemStack stack, EntityPlayer player, boolean advanced){
         return I18n.format("desc." + this.getRegisterName().toString());
     }

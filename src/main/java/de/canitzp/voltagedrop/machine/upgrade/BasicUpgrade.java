@@ -1,6 +1,7 @@
 package de.canitzp.voltagedrop.machine.upgrade;
 
-import de.canitzp.ctpcore.base.ItemBase;
+import de.canitzp.voltagedrop.tile.TileEntityDevice;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 
@@ -12,10 +13,10 @@ public class BasicUpgrade implements IUpgrade<BasicUpgrade>{
     public EnumFacing side = EnumFacing.NORTH;
     public float x, y;
     public String name;
-    public ItemBase item;
+    public ItemStack item;
 
-    public BasicUpgrade(ItemBase item){
-        this.name = item.getRegisterName().getResourceDomain() + "_upgrade";
+    public BasicUpgrade(ItemStack item){
+        this.name = item.getItem().getRegistryName().getResourceDomain() + "_upgrade";
         this.item = item;
     }
 
@@ -63,8 +64,8 @@ public class BasicUpgrade implements IUpgrade<BasicUpgrade>{
     }
 
     @Override
-    public ItemBase getItem(){
-        return this.item;
+    public ItemStack getRenderStack(TileEntityDevice tile){
+        return item;
     }
 
     @Override

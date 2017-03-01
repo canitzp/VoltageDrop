@@ -1,0 +1,19 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "minecraft:cube_all",
+    "transform": "forge:default-block",
+    "textures" : {
+        "all" : "voltagedrop:blocks/ore_dolomite" 
+        }
+  },
+  "variants": {
+    "normal": [{}],
+    "inventory": [{}],
+    "weight":{
+        "low":{},
+        "medium":{},
+        "high":{}
+    }
+  }
+}

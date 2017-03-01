@@ -7,7 +7,6 @@ import de.canitzp.voltagedrop.tile.TileEntityDevice;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.item.ItemStack;
 
 import java.util.List;
 
@@ -26,7 +25,7 @@ public class TileUpgradeRenderer<T extends TileEntityDevice> extends TileEntityS
             GlStateManager.translate((float) x + 0.5F, (float) y + 0.5F, (float) z + 0.5F);
             RenderUtil.transformToFront(state.getValue(((BlockContainerBase) state.getBlock()).getFacing()), upgrade.getX(), upgrade.getY(), 0);
             GlStateManager.scale(upgrade.getScale(), upgrade.getScale(), upgrade.getScale());
-            RenderUtil.renderItemInWorld(new ItemStack(upgrade.getItem()));
+            RenderUtil.renderItemInWorld(upgrade.getRenderStack(tile));
             GlStateManager.popMatrix();
         }
         super.renderTileEntityAt(tile, x, y, z, partialTicks, destroyStage);
