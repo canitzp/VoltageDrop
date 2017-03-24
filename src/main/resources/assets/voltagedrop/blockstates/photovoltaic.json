@@ -4,9 +4,9 @@
         "model": "minecraft:cube",
         "transform": "forge:default-block",
         "textures": {
-            "particle": "voltagedrop:blocks/photovoltaic_side",
-            "down": "voltagedrop:blocks/photovoltaic_top_bottom",
-            "up": "voltagedrop:blocks/photovoltaic_top",
+            "particle": "voltagedrop:blocks/photovoltaic_panel_side",
+            "down": "voltagedrop:blocks/photovoltaic_panel_bottom",
+            "up": "voltagedrop:blocks/photovoltaic_panel_top",
             "south": "#particle",
             "north": "#particle",
             "east": "#particle",
