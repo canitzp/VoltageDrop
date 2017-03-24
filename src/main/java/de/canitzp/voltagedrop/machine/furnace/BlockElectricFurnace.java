@@ -9,6 +9,7 @@ import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
+import net.minecraftforge.fml.relauncher.Side;
 
 import java.util.Map;
 
@@ -30,15 +31,14 @@ public class BlockElectricFurnace extends BlockEnergyDevice{
     }
 
     @Override
-    public void onRegister(IRegistryEntry[] otherEntries){
-        super.onRegister(otherEntries);
-        for(Map.Entry<ItemStack, ItemStack> entry : FurnaceRecipes.instance().getSmeltingList().entrySet()){
-            MCRegistry.register(new Recipes.ElectricFurnace(entry.getKey(), entry.getValue(), 150));
-        }
+    protected BlockStateContainer createBlockState(){
+        return new BlockStateContainer(this, getFacing(), ACTIVE);
     }
 
     @Override
-    protected BlockStateContainer createBlockState(){
-        return new BlockStateContainer(this, getFacing(), ACTIVE);
+    public void init(Side side) {
+        for(Map.Entry<ItemStack, ItemStack> entry : FurnaceRecipes.instance().getSmeltingList().entrySet()){
+            MCRegistry.register(new Recipes.ElectricFurnace(entry.getKey(), entry.getValue(), 150));
+        }
     }
 }

@@ -3,13 +3,15 @@ package de.canitzp.voltagedrop.machine.arcoven;
 import de.canitzp.ctpcore.recipe.RecipeRegistry;
 import de.canitzp.ctpcore.util.NBTSaveType;
 import de.canitzp.ctpcore.util.NBTUtil;
+import de.canitzp.voltagedrop.Values;
 import de.canitzp.voltagedrop.api.recipe.Recipes;
 import de.canitzp.voltagedrop.capabilities.SidedEnergyDevice;
 import de.canitzp.voltagedrop.capabilities.UserEnergyDevice;
 import de.canitzp.voltagedrop.capabilities.Voltages;
-import de.canitzp.voltagedrop.tile.TileEntityDevice;
+import de.canitzp.voltagedrop.tile.TileUser;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -17,52 +19,21 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**
  * @author canitzp
  */
-public class TileArcOven extends TileEntityDevice<UserEnergyDevice>{
+public class TileArcOven extends TileUser{
 
-    private int timeLeft;
-    private ItemStack outputStack = ItemStack.EMPTY;
-
-    @Override
-    protected SidedEnergyDevice<UserEnergyDevice> getSidedEnergyDevice(World world, BlockPos pos){
-        return SidedEnergyDevice.createSingleEmpty(UserEnergyDevice.class, Voltages.MAINS, 25);
+    public TileArcOven() {
+        super(Values.ARC_OVEN_VOLTAGE, Values.ARC_OVEN_CAPACITY, Values.ARC_OVEN_CONSUMPTION, Recipes.ARC_OVEN.getCategory(), EnumParticleTypes.FLAME, BlockArcOven.ACTIVE);
     }
 
     @Override
-    public void update(){
-        super.update();
-        if(!world.isRemote){
-            if(world.getTotalWorldTime() % 20 == 0 && timeLeft <= 0){
-                if(outputStack.isEmpty()){
-                    List<EntityItem> items = this.world.getEntitiesWithinAABB(EntityItem.class, getInside(0.55F));
-                    for(EntityItem item : items){
-                        ItemStack stack = item.getEntityItem();
-                        if(RecipeRegistry.hasRecipeFor(Recipes.ARC_OVEN.getCategory(), stack)){
-                            if(checkForBurn(stack)){
-                                this.spawnParticle(EnumParticleTypes.FLAME, item.getPosition().getX(), item.getPosition().getY() + 0.5, item.getPosition().getZ(), 50, 0.25D, new int[0]);
-                            }
-                        }
-                    }
-                } else {
-                    this.world.spawnEntity(new EntityItem(world, pos.getX(), pos.getY() + 0.5D, pos.getZ(), this.outputStack));
-                    this.outputStack = ItemStack.EMPTY;
-                }
-            }
-            if(timeLeft > 0){
-                if(this.getDeviceForSide(EnumFacing.NORTH).getStored() >= 0.01F){
-                    timeLeft--;
-                    this.getDeviceForSide(EnumFacing.NORTH).extractEnergy(Voltages.MAINS, 0.01F, false);
-                }
-            }
-        }
-    }
-
-    private boolean checkForBurn(ItemStack stack){
-        if(!(world.getBlockState(pos.offset(EnumFacing.DOWN)).getBlock() == Blocks.LAVA)){
+    protected boolean checkForBurn(ItemStack stack){
+        if(!(world.getBlockState(pos.offset(EnumFacing.DOWN)).getMaterial().equals(Material.LAVA))){
            return false;
         }
         Recipes.ArcOven recipe = (Recipes.ArcOven) RecipeRegistry.getRecipeFor(Recipes.ARC_OVEN.getCategory(), stack);
@@ -73,20 +44,6 @@ public class TileArcOven extends TileEntityDevice<UserEnergyDevice>{
             return true;
         }
         return false;
-    }
-
-    @Override
-    public void writeToNBT(NBTTagCompound compound, NBTSaveType type){
-        compound.setInteger("TimeLeft", this.timeLeft);
-        NBTUtil.setItemStack(compound, "OutStack", this.outputStack);
-        super.writeToNBT(compound, type);
-    }
-
-    @Override
-    public void readFromNBT(NBTTagCompound compound, NBTSaveType type){
-        this.timeLeft = compound.getInteger("TimeLeft");
-        this.outputStack = NBTUtil.getItemStack(compound, "OutStack");
-        super.readFromNBT(compound, type);
     }
 
 }

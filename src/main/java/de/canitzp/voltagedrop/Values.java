@@ -24,9 +24,14 @@ public class Values{
     public static final Voltages BATTERY_MAINS_VOLTAGE = Voltages.MAINS;
     public static final float BATTERY_MAINS_CAPACITY = 450F;
 
-    /** User */
+    /** Furnace */
     public static final Voltages ELECTRIC_FURNACE_VOLTAGE = Voltages.MAINS;
     public static final float ELECTRIC_FURNACE_CAPACITY = 5F;
     public static final float ELECTRIC_FURNACE_CONSUMPTION = 0.004F;
+
+    /** Arc Furnace */
+    public static final Voltages ARC_OVEN_VOLTAGE = Voltages.MAINS;
+    public static final float ARC_OVEN_CAPACITY = 15F;
+    public static final float ARC_OVEN_CONSUMPTION = 0.0075F;
 
 }

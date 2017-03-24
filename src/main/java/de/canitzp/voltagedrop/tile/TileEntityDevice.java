@@ -31,9 +31,9 @@ import java.util.List;
  */
 public abstract class TileEntityDevice<K extends IEnergyDevice> extends TileEntityBase implements ITickable, ISyncable{
 
-    private List<IUpgrade> installedUpgrades = new ArrayList<>();
+    protected List<IUpgrade> installedUpgrades = new ArrayList<>();
     public SidedEnergyDevice<K> sidedEnergyDevice = new SidedEnergyDevice<K>().setUnstable();
-    public int ticks;
+    protected int ticks;
 
     @Override
     public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing){

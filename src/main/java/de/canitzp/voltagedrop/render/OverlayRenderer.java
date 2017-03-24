@@ -30,7 +30,7 @@ public class OverlayRenderer{
                 if(state.getBlock() instanceof IInfoRender){
                     TileEntity tile = minecraft.world.getTileEntity(pos);
                     if(tile != null && tile instanceof TileEntityDevice){
-                        ((IInfoRender) state.getBlock()).render(minecraft.fontRendererObj, event.getResolution(), minecraft.world, minecraft.player, pos, state, (TileEntityDevice) tile);
+                        ((IInfoRender) state.getBlock()).render(minecraft.fontRenderer, event.getResolution(), minecraft.world, minecraft.player, pos, state, (TileEntityDevice) tile);
                     }
                 }
             }

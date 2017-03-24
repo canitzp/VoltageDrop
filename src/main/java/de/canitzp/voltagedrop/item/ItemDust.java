@@ -13,14 +13,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 /**
  * @author canitzp
  */
-public class ItemIngot extends ItemColored{
+public class ItemDust extends ItemColored {
 
-    private static final String PREFIX = I18n.format("prefix.voltagedrop:ingot");
+    private static final String PREFIX = I18n.format("prefix.voltagedrop:dust");
 
     private String name;
 
-    public ItemIngot(String name, int color){
-        super(new ResourceLocation(VoltageDrop.MODID, "ingot_" + name), color);
+    public ItemDust(String name, int color) {
+        super(new ResourceLocation(VoltageDrop.MODID, "dust_" + name), color);
         this.setCreativeTab(VoltageDrop.tab);
         this.name = name;
     }
@@ -28,11 +28,12 @@ public class ItemIngot extends ItemColored{
     @SideOnly(Side.CLIENT)
     @Override
     public void registerRenderer(){
-        RenderingRegistry.addRenderer(this, new ModelResourceLocation(new ResourceLocation(VoltageDrop.MODID, "ingot"), "inventory"));
+        RenderingRegistry.addRenderer(this, new ModelResourceLocation(new ResourceLocation(VoltageDrop.MODID, "dust"), "inventory"));
     }
 
     @Override
     public String getItemStackDisplayName(ItemStack stack){
-        return PREFIX + " " + I18n.format("ore.voltagedrop:" + this.name);
+        return I18n.format("ore.voltagedrop:" + this.name) + " " + PREFIX;
     }
+
 }

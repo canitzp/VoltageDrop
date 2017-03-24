@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
 /**
  * @author canitzp
  */
-@Mod(modid = Cosmos.MODID, name = Cosmos.MODNAME, version = Cosmos.VERSION, dependencies = "required-after:voltagedrop")
+//@Mod(modid = Cosmos.MODID, name = Cosmos.MODNAME, version = Cosmos.VERSION, dependencies = "required-after:voltagedrop")
 public class Cosmos {
 
     public static final String MODID = "cosmos";

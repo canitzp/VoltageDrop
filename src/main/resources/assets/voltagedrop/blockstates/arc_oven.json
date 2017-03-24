@@ -4,11 +4,11 @@
         "model": "minecraft:cube",
         "transform": "forge:default-block",
         "textures": {
-            "particle": "voltagedrop:blocks/arc_oven_side_off",
-            "down": "voltagedrop:blocks/arc_oven_bottom",
-            "up": "voltagedrop:blocks/arc_oven_top_off",
+            "particle": "voltagedrop:blocks/arc_furnace_side_off",
+            "down": "voltagedrop:blocks/arc_furnace_bottom",
+            "up": "voltagedrop:blocks/arc_furnace_top_off",
             "south": "#particle",
-            "north": "voltagedrop:blocks/arc_oven_front_off",
+            "north": "voltagedrop:blocks/arc_furnace_front_off",
             "east": "#particle",
             "west": "#particle"
         }
@@ -29,6 +29,16 @@
             "down_south": {"x": 90, "y": 180},
             "down_west": {"x": 90, "y": 270},
             "down_east": {"x": 90, "y": 90}
+        },
+        "active": {
+            "false": {},
+            "true": {
+                "textures" : {
+                    "particle": "voltagedrop:blocks/arc_furnace_side_on",
+                    "north": "voltagedrop:blocks/arc_furnace_front_on",
+                    "up": "voltagedrop:blocks/arc_furnace_top_on"
+                }
+            }
         }
     }
 }

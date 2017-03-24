@@ -4,12 +4,17 @@ import de.canitzp.ctpcore.base.BlockBase;
 import de.canitzp.ctpcore.base.ItemBlockBase;
 import de.canitzp.ctpcore.registry.IRegistryEntry;
 import de.canitzp.ctpcore.registry.SmeltingRecipeProvider;
+import de.canitzp.ctpcore.render.RenderingRegistry;
 import de.canitzp.voltagedrop.VoltageDrop;
+import de.canitzp.voltagedrop.api.recipe.Recipes;
+import de.canitzp.voltagedrop.item.ItemDust;
 import de.canitzp.voltagedrop.item.ItemIngot;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -19,9 +24,10 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,20 +35,22 @@ import java.util.List;
 /**
  * @author canitzp
  */
-public class BlockWeightedOre extends BlockBase<BlockWeightedOre>{
+public class BlockWeightedOre extends BlockBase<BlockWeightedOre> {
 
     public static final PropertyEnum<Weight> WEIGHT = PropertyEnum.create("weight", Weight.class);
-    private static final String PREFIX = I18n.translateToLocal("prefix.voltagedrop:ore");
+    private static final String PREFIX = I18n.format("prefix.voltagedrop:ore");
 
     private ItemIngot ingot;
+    private ItemDust dust;
     private ItemBlockBase itemBlock = new ItemBlockBase(this);
     private String name;
 
-    public BlockWeightedOre(String name, int ingotColor){
+    public BlockWeightedOre(String name, int color){
         super(Material.ROCK, new ResourceLocation(VoltageDrop.MODID, "ore_".concat(name)));
         this.setCreativeTab(VoltageDrop.tab);
         this.setDefaultState(this.blockState.getBaseState().withProperty(WEIGHT, Weight.MEDIUM));
-        this.ingot = new ItemIngot(name, ingotColor);
+        this.ingot = new ItemIngot(name, color);
+        this.dust = new ItemDust(name, color);
         this.name = name;
     }
 
@@ -105,12 +113,14 @@ public class BlockWeightedOre extends BlockBase<BlockWeightedOre>{
 
     @Override
     public String getLocalizedName(){
-        return PREFIX + " " + I18n.translateToLocal("ore.voltagedrop:" + this.name);
+        return I18n.format("ore.voltagedrop:" + this.name) + " " + PREFIX;
     }
 
     @Override
     public IRegistryEntry[] getRegisterElements(){
-        return new IRegistryEntry[]{this, itemBlock, this.ingot, new SmeltingRecipeProvider(new ItemStack(itemBlock), new ItemStack(this.ingot))};
+        return new IRegistryEntry[]{this, itemBlock, this.ingot, this.dust,
+                new SmeltingRecipeProvider(new ItemStack(this.dust), new ItemStack(this.ingot)),
+                new Recipes.ArcOven(new ItemStack(this.itemBlock), new ItemStack(this.dust))};
     }
 
     public ItemIngot getIngot(){
